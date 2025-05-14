@@ -10,6 +10,7 @@ public class Game1 : Game
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
     private int gridSize;
+    private int screenMargin;
     private int screenWidth;
     private int screenHeight;
 
@@ -25,9 +26,9 @@ public class Game1 : Game
     {
         // TODO: Add your initialization logic here
         gridSize = 20;
-
-        screenHeight = 500;
-        screenWidth = 500;
+        screenMargin = 125;
+        screenHeight = 750;
+        screenWidth = 750;
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
@@ -59,11 +60,11 @@ public class Game1 : Game
         spriteBatch.Begin();
         var mouseState = Mouse.GetState();
         Point mousePosition = new Point(mouseState.X, mouseState.Y);
-        int hoverX = (mousePosition.X / gridSize) * gridSize;
-        int hoverY = (mousePosition.Y / gridSize) * gridSize;
+        int hoverX = ((mousePosition.X - screenMargin) / gridSize) * gridSize + screenMargin;
+        int hoverY = ((mousePosition.Y - screenMargin) / gridSize) * gridSize + screenMargin;
         Rectangle hoveredCell = new Rectangle(hoverX, hoverY, gridSize, gridSize);
-        for(int rows = 0; rows < screenWidth; rows+=gridSize) {
-            for(int cols = 0; cols < screenHeight; cols+=gridSize) {
+        for(int rows = screenMargin; rows < screenWidth - screenMargin; rows+=gridSize) {
+            for(int cols = screenMargin; cols < screenHeight - screenMargin; cols+=gridSize) {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
                 if(rect == hoveredCell) { //if is hovered change to black
