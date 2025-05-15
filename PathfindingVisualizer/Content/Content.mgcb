@@ -1,4 +1,3 @@
-
 #----------------------------- Global Properties ----------------------------#
 
 /outputDir:bin/$(Platform)
@@ -8,8 +7,13 @@
 /profile:Reach
 /compress:False
 
-#-------------------------------- References --------------------------------#
+#-------------------------------- References ---------------------------------#
 
 
 #---------------------------------- Content ---------------------------------#
 
+#begin distanceFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/build:distanceFont.spritefont
