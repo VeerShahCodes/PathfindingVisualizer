@@ -32,7 +32,8 @@ public class Game1 : Game
     private Rectangle endingBlock;
     private float fontScale;
     private Random random;
-
+    private bool shouldDrawPath;
+    private List<Vertex<Point>> pathList;
     //textures ands fonts
     SpriteFont distanceFont;
     public Game1()
@@ -45,6 +46,9 @@ public class Game1 : Game
     protected override void Initialize()
     {
         Random random = new Random();
+
+        shouldDrawPath = false;
+        pathList = new List<Vertex<Point>>();
 
         gridSize = 50;
         screenMargin = 125;
@@ -67,7 +71,8 @@ public class Game1 : Game
         graph = new Graph<Point>();
 
         //create vertexes
-        for(int rows = 0; rows < graphWidth; rows++) {
+        for (int rows = 0; rows < graphWidth; rows++)
+        {
             for (int cols = 0; cols < graphHeight; cols++)
             {
                 graph.AddVertex(new Point(rows, cols));
@@ -75,8 +80,10 @@ public class Game1 : Game
             }
         }
         //create edges
-        for(int i = 0; i < graphWidth; i++) {
-            for(int j = 0; j < graphHeight; j++) {
+        for (int i = 0; i < graphWidth; i++)
+        {
+            for (int j = 0; j < graphHeight; j++)
+            {
                 double a = random.NextDouble() * 5;
                 double b = random.NextDouble() * 5;
                 double c = Math.Sqrt(a + b);
@@ -91,19 +98,18 @@ public class Game1 : Game
                 else if (j == graphHeight - 1)
                 {
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
                 }
                 else
                 {
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
+
                 }
 
-                
+
             }
         }
+
 
 
         for (int i = 0; i < graph.Edges.Count; i++)
@@ -131,26 +137,33 @@ public class Game1 : Game
         mouseX = ((mouseState.X - screenMargin) / gridSize) * gridSize + screenMargin;
         mouseY = ((mouseState.Y - screenMargin) / gridSize) * gridSize + screenMargin;
         hoveredBox = new Rectangle(mouseX, mouseY, gridSize, gridSize);
-        for(int rows = screenMargin; rows < screenWidth - screenMargin; rows+=gridSize) {
-            for(int cols = screenMargin; cols < screenHeight - screenMargin; cols+=gridSize) {
+        for (int rows = screenMargin; rows < screenWidth - screenMargin; rows += gridSize)
+        {
+            for (int cols = screenMargin; cols < screenHeight - screenMargin; cols += gridSize)
+            {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
-                if(mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && hoveredBox == rect) {
-                    if(isFirstSelection) {
+                if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && hoveredBox == rect)
+                {
+                    if (isFirstSelection)
+                    {
                         startingBlock = hoveredBox;
                         isFirstSelection = false;
                     }
-                    else {
+                    else
+                    {
                         endingBlock = hoveredBox;
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
-                        var list= graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
-                        Console.WriteLine($"Path Cost: {graph.GetDistance(list)}");
-                        var list1 = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
+                        //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
+                        pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
+                         Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
+
+                        shouldDrawPath = true;
                         isFirstSelection = true;
                     }
                 }
 
-            
+
             }
         }
         base.Update(gameTime);
@@ -164,17 +177,21 @@ public class Game1 : Game
         spriteBatch.Begin();
 
         DrawGrid();
+        DrawPath();
 
         base.Draw(gameTime);
         spriteBatch.End();
 
     }
 
-    public void DrawGrid() {
+    public void DrawGrid()
+    {
         Point graphPoint = new Point(((mouseState.X - screenMargin) / gridSize * gridSize + screenMargin) / gridSize, ((mouseState.Y - screenMargin) / gridSize * gridSize + screenMargin) / gridSize);
         //draw boxes
-        for(int rows = screenMargin; rows < screenWidth - screenMargin; rows+=gridSize) {
-            for(int cols = screenMargin; cols < screenHeight - screenMargin; cols+=gridSize) {
+        for (int rows = screenMargin; rows < screenWidth - screenMargin; rows += gridSize)
+        {
+            for (int cols = screenMargin; cols < screenHeight - screenMargin; cols += gridSize)
+            {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
                 if (rect == hoveredBox)
@@ -204,7 +221,7 @@ public class Game1 : Game
                 {
                     spriteBatch.DrawRectangle(rect, color);
                 }
-                
+
             }
         }
 
@@ -218,23 +235,23 @@ public class Game1 : Game
                 Point currPoint = new Point(i, j);
                 Edge<Point> rightEdge = graph.GetEdge(currVert, rightVert);
                 Edge<Point> downEdge = graph.GetEdge(currVert, downVert);
-                
 
-                
+
+
                 if (rightEdge != null)
                 {
                     float originalValue = rightEdge.Distance;
                     float rounded = (float)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
-                        distanceFont, 
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture), 
-                        new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin), 
-                        Color.Black, 
-                        0f,                 
-                        Vector2.Zero,      
-                        fontScale,           
-                        SpriteEffects.None, 
-                        0f                
+                        distanceFont,
+                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin),
+                        Color.Black,
+                        0f,
+                        Vector2.Zero,
+                        fontScale,
+                        SpriteEffects.None,
+                        0f
                     );
 
                 }
@@ -243,15 +260,15 @@ public class Game1 : Game
                     float originalValue = downEdge.Distance;
                     float rounded = (float)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
-                        distanceFont, 
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture), 
-                        new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2), 
-                        Color.Black, 
-                        0f,                
-                        Vector2.Zero,      
-                        fontScale,           
-                        SpriteEffects.None, 
-                        0f                 
+                        distanceFont,
+                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2),
+                        Color.Black,
+                        0f,
+                        Vector2.Zero,
+                        fontScale,
+                        SpriteEffects.None,
+                        0f
                     );
 
                 }
@@ -260,7 +277,20 @@ public class Game1 : Game
 
             }
         }
-        
-        
+
+
     }
+
+    public void DrawPath()
+    {
+        if (shouldDrawPath)
+        {
+            for (int i = 0; i < pathList.Count; i++)
+            {
+                Rectangle drawRect = new Rectangle(pathList[i].Value.X * gridSize + screenMargin, pathList[i].Value.Y * gridSize + screenMargin, gridSize, gridSize);
+                spriteBatch.DrawRectangle(drawRect, Color.Blue);
+            }
+        }
+    }
+
 }
