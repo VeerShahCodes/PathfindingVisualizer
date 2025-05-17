@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>c:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/distanceFont.spritefont</SourceFile>
+  <SourceFile>C:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/distanceFont.spritefont</SourceFile>
   <SourceTime>2025-05-14T21:17:42.344475-07:00</SourceTime>
-  <DestFile>c:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/bin/DesktopGL/Content/distanceFont.xnb</DestFile>
-  <DestTime>2025-05-14T21:17:44.3905906-07:00</DestTime>
+  <DestFile>C:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/bin/DesktopGL/Content/distanceFont.xnb</DestFile>
+  <DestTime>2025-05-16T19:48:47.3604149-07:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2025-04-05T03:10:54-07:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>
