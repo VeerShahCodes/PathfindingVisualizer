@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
+
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -29,6 +31,7 @@ public class Game1 : Game
     private Rectangle startingBlock;
     private Rectangle endingBlock;
     private float fontScale;
+    private Random random;
 
     //textures ands fonts
     SpriteFont distanceFont;
@@ -41,7 +44,9 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        gridSize = 20;
+        Random random = new Random();
+
+        gridSize = 50;
         screenMargin = 125;
         screenHeight = 750;
         screenWidth = 750;
@@ -72,26 +77,28 @@ public class Game1 : Game
         //create edges
         for(int i = 0; i < graphWidth; i++) {
             for(int j = 0; j < graphHeight; j++) {
-
+                double a = random.NextDouble() * 5;
+                double b = random.NextDouble() * 5;
+                double c = Math.Sqrt(a + b);
                 if (i == graphWidth - 1 && j == graphHeight - 1)
                 {
-
+                    //nothing
                 }
                 else if (i == graphWidth - 1)
                 {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), 1);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
                 }
                 else if (j == graphHeight - 1)
                 {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), 1);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)Math.Sqrt(2));
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
                 }
                 else
                 {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), 1);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), 1);
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)Math.Sqrt(2));
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)Math.Sqrt(2));
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
                 }
 
                 
@@ -134,6 +141,11 @@ public class Game1 : Game
                     }
                     else {
                         endingBlock = hoveredBox;
+                        Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
+                        Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
+                        var list= graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
+                        Console.WriteLine($"Path Cost: {graph.GetDistance(list)}");
+                        var list1 = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
                         isFirstSelection = true;
                     }
                 }
@@ -211,9 +223,11 @@ public class Game1 : Game
                 
                 if (rightEdge != null)
                 {
+                    float originalValue = rightEdge.Distance;
+                    float rounded = (float)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
                         distanceFont, 
-                        rightEdge.Distance.ToString(), 
+                        rounded.ToString("0.0", CultureInfo.InvariantCulture), 
                         new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin), 
                         Color.Black, 
                         0f,                 
@@ -226,9 +240,11 @@ public class Game1 : Game
                 }
                 if (downEdge != null)
                 {
+                    float originalValue = downEdge.Distance;
+                    float rounded = (float)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
                         distanceFont, 
-                        downEdge.Distance.ToString(), 
+                        rounded.ToString("0.0", CultureInfo.InvariantCulture), 
                         new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2), 
                         Color.Black, 
                         0f,                

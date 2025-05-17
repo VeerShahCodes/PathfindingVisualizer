@@ -6,8 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
-using System.Drawing;
+//using System.Drawing;
 
 namespace PathfindingVisualizer;
 
@@ -449,6 +450,8 @@ public class Graph<T>
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
         return 1 * Math.Sqrt(dx * dx + dy * dy);
     }
+
+
 }
 
 
