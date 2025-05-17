@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -27,6 +28,7 @@ public class Game1 : Game
     private bool isFirstSelection;
     private Rectangle startingBlock;
     private Rectangle endingBlock;
+    private float fontScale;
 
     //textures ands fonts
     SpriteFont distanceFont;
@@ -47,13 +49,15 @@ public class Game1 : Game
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
 
+        fontScale = gridSize / 50f;
+
         isFirstSelection = true;
 
         startingBlock = new Rectangle();
         endingBlock = new Rectangle();
 
-        graphWidth = (screenWidth - screenMargin * 2) / gridSize;
-        graphHeight = (screenHeight - screenMargin * 2) / gridSize;
+        graphWidth = (screenWidth - screenMargin * 2) / gridSize + 1;
+        graphHeight = (screenHeight - screenMargin * 2) / gridSize + 1;
         //init graph
         graph = new Graph<Point>();
 
@@ -66,20 +70,39 @@ public class Game1 : Game
             }
         }
         //create edges
-        for(int i = 0; i < graphHeight; i++) {
+        for(int i = 0; i < graphWidth; i++) {
             for(int j = 0; j < graphHeight; j++) {
 
-                graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), 1);
-                graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), 1);
-                graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)Math.Sqrt(2));
-                graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)Math.Sqrt(2));
+                if (i == graphWidth - 1 && j == graphHeight - 1)
+                {
+
+                }
+                else if (i == graphWidth - 1)
+                {
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), 1);
+                }
+                else if (j == graphHeight - 1)
+                {
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), 1);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)Math.Sqrt(2));
+                }
+                else
+                {
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), 1);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), 1);
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)Math.Sqrt(2));
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j - 1), (float)Math.Sqrt(2));
+                }
+
                 
             }
         }
-        for(int i = 0; i < graph.Vertices.Count; i++) {
-            Console.Write(graph.Vertices[i].Value);
-        }
 
+
+        for (int i = 0; i < graph.Edges.Count; i++)
+        {
+            Console.WriteLine($"Point 1:{graph.Edges[i].StartingPoint.Value}, Point 2:{graph.Edges[i].EndingPoint.Value}, Distance: {graph.Edges[i].Distance}");
+        }
         base.Initialize();
     }
 
@@ -94,6 +117,7 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
         mouseState = Mouse.GetState();
 
 
@@ -141,19 +165,31 @@ public class Game1 : Game
             for(int cols = screenMargin; cols < screenHeight - screenMargin; cols+=gridSize) {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
-                if(rect == hoveredBox) { 
-                    if(isFirstSelection) 
+                if (rect == hoveredBox)
+                {
+                    if (isFirstSelection)
                     {
                         color = Color.LightGreen;
                         spriteBatch.FillRectangle(rect, color);
                     }
-                    else {
+                    else
+                    {
                         color = Color.Red;
                         spriteBatch.FillRectangle(rect, color);
                     }
 
+
                 }
-                else {
+                else if (rect == startingBlock)
+                {
+                    spriteBatch.FillRectangle(rect, Color.LightGreen);
+                }
+                else if (rect == endingBlock)
+                {
+                    spriteBatch.FillRectangle(rect, Color.Red);
+                }
+                else
+                {
                     spriteBatch.DrawRectangle(rect, color);
                 }
                 
@@ -164,17 +200,46 @@ public class Game1 : Game
         {
             for (int j = 0; j < graphHeight; j++)
             {
-                Point rightPoint = new Point(i, j + 1);
-                Vertex<Point> rightVert = graph.Search(new Point(i, j + 1));
-                Vertex<Point> downVert = graph.Search(new Point(i + 1, j));
+                Vertex<Point> rightVert = graph.Search(new Point(i + 1, j));
+                Vertex<Point> downVert = graph.Search(new Point(i, j + 1));
                 Vertex<Point> currVert = graph.Search(new Point(i, j));
                 Point currPoint = new Point(i, j);
-                Edge<Point> edge = graph.GetEdge(currVert, rightVert);
-                if (edge != null)
+                Edge<Point> rightEdge = graph.GetEdge(currVert, rightVert);
+                Edge<Point> downEdge = graph.GetEdge(currVert, downVert);
+                
+
+                
+                if (rightEdge != null)
                 {
-                  spriteBatch.DrawString(distanceFont, edge.Distance.ToString(), new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin), Color.Black);
+                    spriteBatch.DrawString(
+                        distanceFont, 
+                        rightEdge.Distance.ToString(), 
+                        new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin), 
+                        Color.Black, 
+                        0f,                 
+                        Vector2.Zero,      
+                        fontScale,           
+                        SpriteEffects.None, 
+                        0f                
+                    );
 
                 }
+                if (downEdge != null)
+                {
+                    spriteBatch.DrawString(
+                        distanceFont, 
+                        downEdge.Distance.ToString(), 
+                        new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2), 
+                        Color.Black, 
+                        0f,                
+                        Vector2.Zero,      
+                        fontScale,           
+                        SpriteEffects.None, 
+                        0f                 
+                    );
+
+                }
+
 
 
             }
