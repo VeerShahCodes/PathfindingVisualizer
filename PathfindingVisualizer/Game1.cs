@@ -32,6 +32,11 @@ public class Game1 : Game
     private Rectangle endingBlock;
     private float fontScale;
     private Random random;
+    private int currentPathIndex = 0;
+    private float timeToNextSquare = 0;
+    private float animationSpeed = 4f;
+    private bool animationInProgress = false;
+
     private bool shouldDrawPath;
     private List<Vertex<Point>> pathList;
     //textures ands fonts
@@ -156,10 +161,31 @@ public class Game1 : Game
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
-                         Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
+                        Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
 
-                        shouldDrawPath = true;
+                        StartPathAnimation();
                         isFirstSelection = true;
+                    }
+                }
+                if (animationInProgress && currentPathIndex < pathList.Count)
+                {
+                    timeToNextSquare -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    
+                    if (timeToNextSquare <= 0)
+                    {
+                        // Increment index and reset timer
+                        currentPathIndex++;
+                        timeToNextSquare = animationSpeed;
+                        
+                        // Log for debugging
+                        System.Diagnostics.Debug.WriteLine($"Current Path Index: {currentPathIndex}/{pathList.Count}");
+                        
+                        // Check if we're done
+                        if (currentPathIndex >= pathList.Count)
+                        {
+                            animationInProgress = false;
+                            System.Diagnostics.Debug.WriteLine("Animation complete");
+                        }
                     }
                 }
 
@@ -177,7 +203,7 @@ public class Game1 : Game
         spriteBatch.Begin();
 
         DrawGrid();
-        DrawPath();
+        DrawPath(spriteBatch);
 
         base.Draw(gameTime);
         spriteBatch.End();
@@ -281,16 +307,31 @@ public class Game1 : Game
 
     }
 
-    public void DrawPath()
+    public void DrawPath(SpriteBatch spriteBatch)
     {
-        if (shouldDrawPath)
+        if (shouldDrawPath && pathList != null && pathList.Count > 0)
         {
-            for (int i = 0; i < pathList.Count; i++)
+            // Make sure currentPathIndex doesn't exceed pathList.Count
+            int visibleSquares = Math.Min(currentPathIndex, pathList.Count);
+            
+            for (int i = 0; i < visibleSquares; i++)
             {
-                Rectangle drawRect = new Rectangle(pathList[i].Value.X * gridSize + screenMargin, pathList[i].Value.Y * gridSize + screenMargin, gridSize, gridSize);
+                Rectangle drawRect = new Rectangle(
+                    pathList[i].Value.X * gridSize + screenMargin, 
+                    pathList[i].Value.Y * gridSize + screenMargin, 
+                    gridSize, gridSize);
+                
                 spriteBatch.DrawRectangle(drawRect, Color.Blue);
             }
         }
+    }
+    public void StartPathAnimation()
+    {
+        currentPathIndex = 0;
+        timeToNextSquare = 0;
+        shouldDrawPath = true;
+        animationInProgress = true;
+
     }
 
 }
