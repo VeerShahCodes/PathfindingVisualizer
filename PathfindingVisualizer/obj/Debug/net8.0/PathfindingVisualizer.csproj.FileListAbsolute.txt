@@ -32,3 +32,4 @@ C:\Users\shahv\OneDrive\Documents\Visual Studio Code\PathfindingVisualizer\Pathf
 C:\Users\shahv\OneDrive\Documents\Visual Studio Code\PathfindingVisualizer\PathfindingVisualizer\bin\Debug\net8.0\MonoGame.Extended.dll
 C:\Users\shahv\OneDrive\Documents\Visual Studio Code\PathfindingVisualizer\PathfindingVisualizer\obj\Debug\net8.0\PathfindingVisualizer.sourcelink.json
 c:\Users\shahv\OneDrive\Documents\Visual Studio Code\PathfindingVisualizer\PathfindingVisualizer\bin\Debug\net8.0\Content\distanceFont.xnb
+c:\Users\shahv\OneDrive\Documents\Visual Studio Code\PathfindingVisualizer\PathfindingVisualizer\bin\Debug\net8.0\Content\pathCostFont.xnb

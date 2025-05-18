@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/distanceFont.spritefont</File>
+    <File>c:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/distanceFont.spritefont</File>
+    <File>c:/Users/shahv/OneDrive/Documents/Visual Studio Code/PathfindingVisualizer/PathfindingVisualizer/Content/pathCostFont.spritefont</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

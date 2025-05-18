@@ -13,7 +13,9 @@
 #---------------------------------- Content ---------------------------------#
 
 #begin distanceFont.spritefont
+#begin pathCostFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /build:distanceFont.spritefont
+/build:pathCostFont.spritefont

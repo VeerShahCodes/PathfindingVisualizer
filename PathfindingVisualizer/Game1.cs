@@ -34,13 +34,14 @@ public class Game1 : Game
     private Random random;
     private int currentPathIndex = 0;
     private float timeToNextSquare = 0;
-    private float animationSpeed = 4f;
+    private float animationSpeed = 30f;
     private bool animationInProgress = false;
-
+    private float lastPathCost = 0;
     private bool shouldDrawPath;
     private List<Vertex<Point>> pathList;
     //textures ands fonts
     SpriteFont distanceFont;
+    SpriteFont pathCostFont;
     public Game1()
     {
         graphics = new GraphicsDeviceManager(this);
@@ -128,6 +129,7 @@ public class Game1 : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
         distanceFont = Content.Load<SpriteFont>("distanceFont");
+        pathCostFont = Content.Load<SpriteFont>("pathCostFont");
 
     }
 
@@ -162,7 +164,7 @@ public class Game1 : Game
                         //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
                         Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
-
+                        lastPathCost = graph.GetDistance(pathList);
                         StartPathAnimation();
                         isFirstSelection = true;
                     }
@@ -204,6 +206,7 @@ public class Game1 : Game
 
         DrawGrid();
         DrawPath(spriteBatch);
+        spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
         spriteBatch.End();
