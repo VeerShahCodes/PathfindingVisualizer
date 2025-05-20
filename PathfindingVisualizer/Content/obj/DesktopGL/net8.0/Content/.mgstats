@@ -1,1 +1,3 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/VSHA0641/Documents/PathfindingVisualizer/PathfindingVisualizer/Content/distanceFont.spritefont","C:/Users/VSHA0641/Documents/PathfindingVisualizer/PathfindingVisualizer/Content/bin/DesktopGL/Content/distanceFont.xnb","FontDescriptionProcessor","SpriteFontContent",2066,21529,0.8582424
+"C:/Users/VSHA0641/Documents/PathfindingVisualizer/PathfindingVisualizer/Content/pathCostFont.spritefont","C:/Users/VSHA0641/Documents/PathfindingVisualizer/PathfindingVisualizer/Content/bin/DesktopGL/Content/pathCostFont.xnb","FontDescriptionProcessor","SpriteFontContent",2063,70681,0.0501783

@@ -34,7 +34,7 @@ public class Game1 : Game
     private Random random;
     private int currentPathIndex = 0;
     private float timeToNextSquare = 0;
-    private float animationSpeed = 30f;
+    private float animationSpeed = 10f;
     private bool animationInProgress = false;
     private float lastPathCost = 0;
     private bool shouldDrawPath;
@@ -205,6 +205,7 @@ public class Game1 : Game
         spriteBatch.Begin();
 
         DrawGrid();
+        DrawVisitedPath(spriteBatch);
         DrawPath(spriteBatch);
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
@@ -310,6 +311,22 @@ public class Game1 : Game
 
     }
 
+
+    public void DrawVisitedPath(SpriteBatch spriteBatch)
+    {
+        if(shouldDrawPath) {
+            for(int i = 0; i < graph.VisitedNodes.Count; i++)
+            {
+                Rectangle drawRect = new Rectangle(
+                    graph.VisitedNodes[i].Value.X * gridSize + screenMargin, 
+                    graph.VisitedNodes[i].Value.Y * gridSize + screenMargin, 
+                    gridSize, gridSize);
+                
+                spriteBatch.DrawRectangle(drawRect, Color.Yellow);
+            }
+        }
+
+    }
     public void DrawPath(SpriteBatch spriteBatch)
     {
         if (shouldDrawPath && pathList != null && pathList.Count > 0)
@@ -324,7 +341,7 @@ public class Game1 : Game
                     pathList[i].Value.Y * gridSize + screenMargin, 
                     gridSize, gridSize);
                 
-                spriteBatch.DrawRectangle(drawRect, Color.Blue);
+                spriteBatch.FillRectangle(drawRect, Color.Blue * 0.5f);
             }
         }
     }
