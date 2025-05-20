@@ -39,6 +39,7 @@ public class Game1 : Game
     private float lastPathCost = 0;
     private bool shouldDrawPath;
     private List<Vertex<Point>> pathList;
+    private bool hasClickedRandomizeButton = false;
     //textures ands fonts
     SpriteFont distanceFont;
     SpriteFont pathCostFont;
@@ -194,6 +195,14 @@ public class Game1 : Game
 
             }
         }
+        // Check if the mouse is over the randomize button
+        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            hasClickedRandomizeButton = true;
+            graph.RandomizeGraph();
+            shouldDrawPath = false;
+        }
         base.Update(gameTime);
         previousState = mouseState;
     }
@@ -207,6 +216,7 @@ public class Game1 : Game
         DrawGrid();
         DrawVisitedPath(spriteBatch);
         DrawPath(spriteBatch);
+        DrawRandomizeButton();
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
@@ -307,6 +317,16 @@ public class Game1 : Game
 
             }
         }
+
+
+    }
+
+    public void DrawRandomizeButton()
+    {
+        // Draw the button
+        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
+        spriteBatch.FillRectangle(buttonRect, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "Randomize", new Vector2(0, 0), Color.White);
 
 
     }
