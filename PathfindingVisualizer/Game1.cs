@@ -49,6 +49,12 @@ public class Game1 : Game
     SpriteFont distanceFont;
     SpriteFont pathCostFont;
 
+    Rectangle randomizeButton;
+    Rectangle dijkstraButton;
+    Rectangle aStarButton;
+    Rectangle breadthFirstButton;
+    Rectangle depthFirstButton;
+
     private String methodName = "A*";
     public Game1()
     {
@@ -71,7 +77,11 @@ public class Game1 : Game
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
-
+        randomizeButton = new Rectangle(0, 0, screenMargin + 50, 75);
+        dijkstraButton = new Rectangle(0, 100, screenMargin, 75);
+        aStarButton = new Rectangle(0, 200, screenMargin, 75);
+        breadthFirstButton = new Rectangle(0, 300, screenMargin, 75);
+        depthFirstButton = new Rectangle(0, 400, screenMargin, 75);
         fontScale = gridSize / 50f;
 
         isFirstSelection = true;
@@ -98,32 +108,27 @@ public class Game1 : Game
         {
             for (int j = 0; j < graphHeight; j++)
             {
-                double a = random.NextDouble() * 5 + 10;
-                double b = random.NextDouble() * 5 + 10;
-                double c = Math.Sqrt(a + b);
-                if (i == graphWidth - 1 && j == graphHeight - 1)
-                {
-                    //nothing
-                }
-                else if (i == graphWidth - 1)
-                {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
-                }
-                else if (j == graphHeight - 1)
-                {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
-                }
-                else
-                {
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
+                double a = 1;
+                double b = 1;
+                double c = Math.Sqrt(2);
+
+                // Right
+                if (i < graphWidth - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
 
-                }
+                // Down
+                if (j < graphHeight - 1)
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
 
+                // Down-Right Diagonal
+                if (i < graphWidth - 1 && j < graphHeight - 1)
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
 
+                // Down-Left Diagonal
+                if (i > 0 && j < graphHeight - 1)
+                    graph.AddUndirectedEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
             }
         }
-
 
 
         for (int i = 0; i < graph.Edges.Count; i++)
@@ -170,12 +175,10 @@ public class Game1 : Game
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
-                        if(methodName == "A*")
-                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
+                        if (methodName == "A*")
+                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
                         else if (methodName == "Dijkstra")
                             pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
-                        else if (methodName == "Greedy")
-                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Euclidean);
                         else if (methodName == "DFS")
                             pathList = graph.PathFindDepthFirst(graph.Search(firstPoint), graph.Search(lastPoint));
                         else if (methodName == "BFS")
@@ -225,16 +228,41 @@ public class Game1 : Game
 
             }
         }
-        // Check if the mouse is over the randomize button
-        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
+        Rectangle buttonRect = randomizeButton;
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
             hasClickedRandomizeButton = true;
             graph.RandomizeGraph();
             shouldDrawPath = false;
         }
+        
+        buttonRect = dijkstraButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            Console.WriteLine("Dijkstra button clicked");
+            methodName = "Dijkstra";
+        }
+
+        buttonRect = aStarButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            methodName = "A*";
+        }
+
+        buttonRect = breadthFirstButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            methodName = "BFS";
+        }
+
+        buttonRect = depthFirstButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            methodName = "DFS";
+        }
         base.Update(gameTime);
         previousState = mouseState;
+
     }
 
     protected override void Draw(GameTime gameTime)
@@ -247,6 +275,10 @@ public class Game1 : Game
         DrawVisitedPath(spriteBatch);
         DrawPath(spriteBatch);
         DrawRandomizeButton();
+        DrawDijkstraButton();
+        DrawAStarButton();
+        DrawBreadthFirstButton();
+        DrawDepthFirstButton();
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
@@ -354,20 +386,42 @@ public class Game1 : Game
     public void DrawRandomizeButton()
     {
         // Draw the button
-        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
-        spriteBatch.FillRectangle(buttonRect, Color.Gray);
+        spriteBatch.FillRectangle(randomizeButton, Color.Gray);
         spriteBatch.DrawString(pathCostFont, "Randomize", new Vector2(0, 0), Color.White);
 
 
     }
 
+    public void DrawDijkstraButton()
+    {
+        spriteBatch.FillRectangle(dijkstraButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "Dijkstra", new Vector2(0, 100), Color.White);
+    }
+
+    public void DrawAStarButton()
+    {
+        spriteBatch.FillRectangle(aStarButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "A*", new Vector2(0, 200), Color.White);
+    }
+
+    public void DrawBreadthFirstButton()
+    {
+        spriteBatch.FillRectangle(breadthFirstButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(0, 300), Color.White);
+    }
+
+    public void DrawDepthFirstButton()
+    {
+        spriteBatch.FillRectangle(depthFirstButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "DFS", new Vector2(0, 400), Color.White);
+    }
 
     public void DrawVisitedPath(SpriteBatch spriteBatch)
     {
         if (shouldDrawPath && graph.VisitedNodes != null)
         {
             int limit = visitedAnimationInProgress ? currentVisitedIndex : graph.VisitedNodes.Count;
-            
+
             for (int i = 0; i < limit; i++)
             {
                 Rectangle drawRect = new Rectangle(
@@ -382,46 +436,18 @@ public class Game1 : Game
     {
         if (shouldDrawPath && pathList != null && pathList.Count > 0)
         {
-            // Make sure currentPathIndex doesn't exceed pathList.Count
             int visibleSquares = Math.Min(currentPathIndex, pathList.Count);
 
-            for (int i = 0; i < visibleSquares; i++)
+            for (int i = 0; i < visibleSquares - 1; i++)
             {
-                Rectangle drawLine = new Rectangle(
-                    pathList[i].Value.X * gridSize + screenMargin,
-                    pathList[i].Value.Y * gridSize + screenMargin,
-                    5, 5);
-                if (i + 1 < pathList.Count)
-                {
-                    if (pathList[i + 1].Value.X > pathList[i].Value.X)
-                    {
-                        drawLine.Width = gridSize;
-                    }
-                    if (pathList[i + 1].Value.Y > pathList[i].Value.Y)
-                    {
-                        drawLine.Height = gridSize;
-                    }
-                    if (pathList[i + 1].Value.X < pathList[i].Value.X)
-                    {
-                        drawLine.Width = gridSize;
-                        drawLine.X -= gridSize;
-                    }
-                    if (pathList[i + 1].Value.Y < pathList[i].Value.Y)
-                    {
-                        drawLine.Height = gridSize;
-                        drawLine.Y -= gridSize;
-                    }
-                }
+                var start = pathList[i].Value;
+                var end = pathList[i + 1].Value;
 
-                Rectangle drawBox = new Rectangle(
-                    pathList[i].Value.X * gridSize + screenMargin,
-                    pathList[i].Value.Y * gridSize + screenMargin,
-                    gridSize, gridSize
-                );
+                var startPos = new Vector2(start.X * gridSize + screenMargin + gridSize / 2f, start.Y * gridSize + screenMargin + gridSize / 2f);
+                var endPos = new Vector2(end.X * gridSize + screenMargin + gridSize / 2f, end.Y * gridSize + screenMargin + gridSize / 2f);
 
-
-                spriteBatch.FillRectangle(drawLine, Color.Blue * 0.5f);
-                spriteBatch.FillRectangle(drawBox, Color.LightCyan * 0.3f);
+                
+                spriteBatch.DrawLine(startPos, endPos, Color.Blue, 4f); 
             }
         }
     }

@@ -454,7 +454,7 @@ public class Graph<T>
             for (int j = 0; j < vertices[i].NeighborCount; j++)
             {
                 //vertices[i].Neighbors[j].Distance = 10f;
-               vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 5 + 10;
+               vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 4 + 1;
             }
         }
     }
@@ -468,21 +468,28 @@ public class Graph<T>
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 10 * (dx + dy);
+        return 1 * (dx + dy);
     }
-
-    public double Diagonal(Vertex<Point> node, Vertex<Point> goal) 
+    public double GreedyManhattan(Vertex<Point> node, Vertex<Point> goal)
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 10 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+        double avgCost = 3.0;
+        return avgCost * (dx + dy);
+    }
+
+    public double Diagonal(Vertex<Point> node, Vertex<Point> goal)
+    {
+        int dx = Math.Abs(node.Value.X - goal.Value.X);
+        int dy = Math.Abs(node.Value.Y - goal.Value.Y);
+        return 1 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
     }
 
     public double Euclidean(Vertex<Point> node, Vertex<Point> goal)
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 10 * Math.Sqrt(dx * dx + dy * dy);
+        return 1 * Math.Sqrt(dx * dx + dy * dy);
     }
 
 
