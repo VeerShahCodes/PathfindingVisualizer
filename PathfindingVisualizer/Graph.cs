@@ -309,7 +309,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  DijkstraAlgorithm(Vertex<T> start, Vertex<T> end)
     {
-        VisitedNodes = new List<Vertex<T>>();
+        VisitedNodes.Clear();
         if (start == null || end == null) return null;
 
         PathfindingInfo pathInfo = new PathfindingInfo(new Dictionary<Vertex<T>, float>(), new() { [start] = null! }, new HashSet<Vertex<T>>());
@@ -328,17 +328,20 @@ public class Graph<T>
         while(queue.Count > 0)
         {
             Vertex<T> current = queue.Dequeue();
-            for(int i = 0; i < current.NeighborCount; i++)
+            if(!VisitedNodes.Contains(current))
+            {
+                VisitedNodes.Add(current);
+            }
+            for (int i = 0; i < current.NeighborCount; i++)
             {
                 float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
-                if(tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
+                if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
                 {
-                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
- 
+
                     pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
                     pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current!;
                     pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
-                } 
+                }
             }
 
             for(int i = 0; i < current.NeighborCount; i++)
@@ -450,7 +453,8 @@ public class Graph<T>
         {
             for (int j = 0; j < vertices[i].NeighborCount; j++)
             {
-                vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 4 + 1;
+                //vertices[i].Neighbors[j].Distance = 10f;
+               vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 5 + 10;
             }
         }
     }
@@ -464,21 +468,21 @@ public class Graph<T>
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 1 * (dx + dy);
+        return 10 * (dx + dy);
     }
 
     public double Diagonal(Vertex<Point> node, Vertex<Point> goal) 
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 1 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+        return 10 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
     }
 
     public double Euclidean(Vertex<Point> node, Vertex<Point> goal)
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 1 * Math.Sqrt(dx * dx + dy * dy);
+        return 10 * Math.Sqrt(dx * dx + dy * dy);
     }
 
 

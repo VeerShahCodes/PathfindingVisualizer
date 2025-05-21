@@ -48,6 +48,8 @@ public class Game1 : Game
     //textures ands fonts
     SpriteFont distanceFont;
     SpriteFont pathCostFont;
+
+    private String methodName = "A*";
     public Game1()
     {
         graphics = new GraphicsDeviceManager(this);
@@ -96,8 +98,8 @@ public class Game1 : Game
         {
             for (int j = 0; j < graphHeight; j++)
             {
-                double a = random.NextDouble() * 4 + 1;
-                double b = random.NextDouble() * 4 + 1;
+                double a = random.NextDouble() * 5 + 10;
+                double b = random.NextDouble() * 5 + 10;
                 double c = Math.Sqrt(a + b);
                 if (i == graphWidth - 1 && j == graphHeight - 1)
                 {
@@ -168,7 +170,17 @@ public class Game1 : Game
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
-                        pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
+                        if(methodName == "A*")
+                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
+                        else if (methodName == "Dijkstra")
+                            pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
+                        else if (methodName == "Greedy")
+                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Euclidean);
+                        else if (methodName == "DFS")
+                            pathList = graph.PathFindDepthFirst(graph.Search(firstPoint), graph.Search(lastPoint));
+                        else if (methodName == "BFS")
+                            pathList = graph.PathFindBreadthFirst(graph.Search(firstPoint), graph.Search(lastPoint));
+                        //pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
                         Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
                         lastPathCost = graph.GetDistance(pathList);
                         StartPathAnimation();
@@ -355,6 +367,7 @@ public class Game1 : Game
         if (shouldDrawPath && graph.VisitedNodes != null)
         {
             int limit = visitedAnimationInProgress ? currentVisitedIndex : graph.VisitedNodes.Count;
+            
             for (int i = 0; i < limit; i++)
             {
                 Rectangle drawRect = new Rectangle(
