@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
+using MonoGame.Extended.Particles.Modifiers;
 namespace PathfindingVisualizer;
 
 public class Game1 : Game
@@ -234,7 +235,7 @@ public class Game1 : Game
             {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
-                if (rect == hoveredBox)
+                if (rect.Intersects(hoveredBox))
                 {
                     if (isFirstSelection)
                     {
@@ -353,15 +354,44 @@ public class Game1 : Game
         {
             // Make sure currentPathIndex doesn't exceed pathList.Count
             int visibleSquares = Math.Min(currentPathIndex, pathList.Count);
-            
+
             for (int i = 0; i < visibleSquares; i++)
             {
-                Rectangle drawRect = new Rectangle(
-                    pathList[i].Value.X * gridSize + screenMargin, 
-                    pathList[i].Value.Y * gridSize + screenMargin, 
-                    gridSize, gridSize);
-                
-                spriteBatch.FillRectangle(drawRect, Color.Blue * 0.5f);
+                Rectangle drawLine = new Rectangle(
+                    pathList[i].Value.X * gridSize + screenMargin,
+                    pathList[i].Value.Y * gridSize + screenMargin,
+                    5, 5);
+                if (i + 1 < pathList.Count)
+                {
+                    if (pathList[i + 1].Value.X > pathList[i].Value.X)
+                    {
+                        drawLine.Width = gridSize;
+                    }
+                    if (pathList[i + 1].Value.Y > pathList[i].Value.Y)
+                    {
+                        drawLine.Height = gridSize;
+                    }
+                    if (pathList[i + 1].Value.X < pathList[i].Value.X)
+                    {
+                        drawLine.Width = gridSize;
+                        drawLine.X -= gridSize;
+                    }
+                    if (pathList[i + 1].Value.Y < pathList[i].Value.Y)
+                    {
+                        drawLine.Height = gridSize;
+                        drawLine.Y -= gridSize;
+                    }
+                }
+
+                Rectangle drawBox = new Rectangle(
+                    pathList[i].Value.X * gridSize + screenMargin,
+                    pathList[i].Value.Y * gridSize + screenMargin,
+                    gridSize, gridSize
+                );
+
+
+                spriteBatch.FillRectangle(drawLine, Color.Blue * 0.5f);
+                spriteBatch.FillRectangle(drawBox, Color.LightCyan * 0.3f);
             }
         }
     }

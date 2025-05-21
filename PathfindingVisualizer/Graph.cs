@@ -398,7 +398,6 @@ public class Graph<T>
         {
 
             Vertex<T> current = queue.Dequeue();
-            VisitedNodes.Add(current);
 
             pathInfo.visited.Add(current);
 
@@ -412,6 +411,7 @@ public class Graph<T>
                     pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
                     pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current;
                     pathInfo.finalDistance[current] = pathInfo.distance[current] + (float)(heuristic(current, current.Neighbors[i].EndingPoint));
+                    
                     pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
                 }
                 if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)

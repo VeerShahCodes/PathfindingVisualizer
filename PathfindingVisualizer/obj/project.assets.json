@@ -366,23 +366,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\VSHA0641\\.nuget\\packages\\": {},
+    "C:\\Users\\shahv\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "projectUniqueName": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
       "projectName": "PathfindingVisualizer",
-      "projectPath": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
-      "packagesPath": "C:\\Users\\VSHA0641\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
+      "projectPath": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "packagesPath": "C:\\Users\\shahv\\.nuget\\packages\\",
+      "outputPath": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\VSHA0641\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\shahv\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
