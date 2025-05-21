@@ -35,10 +35,14 @@ public class Game1 : Game
     private Random random;
     private int currentPathIndex = 0;
     private float timeToNextSquare = 0;
-    private float animationSpeed = 10f;
+    private float animationSpeed = 10;
     private bool animationInProgress = false;
     private float lastPathCost = 0;
     private bool shouldDrawPath;
+    private int currentVisitedIndex = 0;
+    private float visitedAnimationTimer = 0f;
+    private float visitedAnimationSpeed = 5f; 
+    private bool visitedAnimationInProgress = false;
     private List<Vertex<Point>> pathList;
     private bool hasClickedRandomizeButton = false;
     //textures ands fonts
@@ -58,7 +62,7 @@ public class Game1 : Game
         shouldDrawPath = false;
         pathList = new List<Vertex<Point>>();
 
-        gridSize = 50;
+        gridSize = 20;
         screenMargin = 125;
         screenHeight = 750;
         screenWidth = 750;
@@ -92,8 +96,8 @@ public class Game1 : Game
         {
             for (int j = 0; j < graphHeight; j++)
             {
-                double a = random.NextDouble() * 5;
-                double b = random.NextDouble() * 5;
+                double a = random.NextDouble() * 4 + 1;
+                double b = random.NextDouble() * 4 + 1;
                 double c = Math.Sqrt(a + b);
                 if (i == graphWidth - 1 && j == graphHeight - 1)
                 {
@@ -164,7 +168,7 @@ public class Game1 : Game
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
-                        pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
+                        pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Manhattan);
                         Console.WriteLine($"Path Cost: {graph.GetDistance(pathList)}, First Node: {pathList[0].Value}, Last Node: {pathList[pathList.Count - 1].Value}");
                         lastPathCost = graph.GetDistance(pathList);
                         StartPathAnimation();
@@ -174,22 +178,35 @@ public class Game1 : Game
                 if (animationInProgress && currentPathIndex < pathList.Count)
                 {
                     timeToNextSquare -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    
+
                     if (timeToNextSquare <= 0)
                     {
                         // Increment index and reset timer
                         currentPathIndex++;
                         timeToNextSquare = animationSpeed;
-                        
+
                         // Log for debugging
                         System.Diagnostics.Debug.WriteLine($"Current Path Index: {currentPathIndex}/{pathList.Count}");
-                        
+
                         // Check if we're done
                         if (currentPathIndex >= pathList.Count)
                         {
                             animationInProgress = false;
                             System.Diagnostics.Debug.WriteLine("Animation complete");
                         }
+                    }
+                }
+                if (visitedAnimationInProgress && graph.VisitedNodes != null && currentVisitedIndex < graph.VisitedNodes.Count)
+                {
+                    visitedAnimationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    while (visitedAnimationTimer >= visitedAnimationSpeed && currentVisitedIndex < graph.VisitedNodes.Count)
+                    {
+                        currentVisitedIndex++;
+                        visitedAnimationTimer -= visitedAnimationSpeed;
+                    }
+                    if (currentVisitedIndex >= graph.VisitedNodes.Count)
+                    {
+                        visitedAnimationInProgress = false;
                     }
                 }
 
@@ -335,18 +352,18 @@ public class Game1 : Game
 
     public void DrawVisitedPath(SpriteBatch spriteBatch)
     {
-        if(shouldDrawPath) {
-            for(int i = 0; i < graph.VisitedNodes.Count; i++)
+        if (shouldDrawPath && graph.VisitedNodes != null)
+        {
+            int limit = visitedAnimationInProgress ? currentVisitedIndex : graph.VisitedNodes.Count;
+            for (int i = 0; i < limit; i++)
             {
                 Rectangle drawRect = new Rectangle(
-                    graph.VisitedNodes[i].Value.X * gridSize + screenMargin, 
-                    graph.VisitedNodes[i].Value.Y * gridSize + screenMargin, 
+                    graph.VisitedNodes[i].Value.X * gridSize + screenMargin,
+                    graph.VisitedNodes[i].Value.Y * gridSize + screenMargin,
                     gridSize, gridSize);
-                
-                spriteBatch.DrawRectangle(drawRect, Color.Yellow);
+                spriteBatch.FillRectangle(drawRect, Color.Yellow * 0.5f);
             }
         }
-
     }
     public void DrawPath(SpriteBatch spriteBatch)
     {
@@ -401,6 +418,11 @@ public class Game1 : Game
         timeToNextSquare = 0;
         shouldDrawPath = true;
         animationInProgress = true;
+
+         // Start visited animation
+        currentVisitedIndex = 0;
+        visitedAnimationTimer = 0f;
+        visitedAnimationInProgress = true;
 
     }
 

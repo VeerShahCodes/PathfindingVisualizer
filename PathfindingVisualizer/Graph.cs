@@ -373,7 +373,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  AStarAlgorithm(Vertex<T> start, Vertex<T> end, Func<Vertex<T>, Vertex<T>, double> heuristic)
     {
-        VisitedNodes = new List<Vertex<T>>();
+        VisitedNodes.Clear();
         if (start == null || end == null) return null;
 
 
@@ -398,8 +398,13 @@ public class Graph<T>
         {
 
             Vertex<T> current = queue.Dequeue();
+            if(!VisitedNodes.Contains(current))
+            {
+                VisitedNodes.Add(current);
+            }
+     
 
-            pathInfo.visited.Add(current);
+
 
             for (int i = 0; i < current.NeighborCount; i++)
             {
@@ -410,8 +415,7 @@ public class Graph<T>
 
                     pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
                     pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current;
-                    pathInfo.finalDistance[current] = pathInfo.distance[current] + (float)(heuristic(current, current.Neighbors[i].EndingPoint));
-                    
+                    pathInfo.finalDistance[current.Neighbors[i].EndingPoint] = pathInfo.distance[current.Neighbors[i].EndingPoint] + (float)(heuristic(current.Neighbors[i].EndingPoint, end));
                     pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
                 }
                 if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)
@@ -446,7 +450,7 @@ public class Graph<T>
         {
             for (int j = 0; j < vertices[i].NeighborCount; j++)
             {
-                vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 5;
+                vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 4 + 1;
             }
         }
     }
@@ -467,7 +471,7 @@ public class Graph<T>
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 1* (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+        return 1 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
     }
 
     public double Euclidean(Vertex<Point> node, Vertex<Point> goal)
