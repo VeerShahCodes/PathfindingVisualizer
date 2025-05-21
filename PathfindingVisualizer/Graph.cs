@@ -17,7 +17,7 @@ public class Graph<T>
     private List<Vertex<T>> vertices;
     public IReadOnlyList<Vertex<T>> Vertices => vertices;
     private Dictionary<(Vertex<T>, Vertex<T>), Edge<T>> edgeDictionary = new Dictionary<(Vertex<T>, Vertex<T>), Edge<T>>();
-
+    public List<Vertex<T>> VisitedNodes;
     public IReadOnlyList<Edge<T>> Edges
 
     {
@@ -40,6 +40,7 @@ public class Graph<T>
 
     public Graph()
     {
+        VisitedNodes = new List<Vertex<T>>();
         vertices = new List<Vertex<T>>();
     }
 
@@ -184,6 +185,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  PathFindBreadthFirst(Vertex<T>  start, Vertex<T>  end)
     {
+        VisitedNodes = new List<Vertex<T>>();
         if (start == null || end == null) return null;
         float pathCost = 0f;
 
@@ -220,6 +222,7 @@ public class Graph<T>
             {
                 if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
                 {
+                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
                     queue.Enqueue(current.Neighbors[i].EndingPoint);
                     previousVertex[current.Neighbors[i].EndingPoint] = current;
                 }
@@ -230,6 +233,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  PathFindDepthFirst(Vertex<T>  start, Vertex<T>  end)
     {
+        VisitedNodes = new List<Vertex<T>>();
         if (start == null || end == null) return null;
         float pathCost = 0f;
         Dictionary<Vertex<T>, Vertex<T> > previousVertex = new()
@@ -266,6 +270,7 @@ public class Graph<T>
             {
                 if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
                 {
+                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
                     stack.Push(current.Neighbors[i].EndingPoint);
                     previousVertex[current.Neighbors[i].EndingPoint] = current;
                 }
@@ -304,6 +309,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  DijkstraAlgorithm(Vertex<T> start, Vertex<T> end)
     {
+        VisitedNodes = new List<Vertex<T>>();
         if (start == null || end == null) return null;
 
         PathfindingInfo pathInfo = new PathfindingInfo(new Dictionary<Vertex<T>, float>(), new() { [start] = null! }, new HashSet<Vertex<T>>());
@@ -327,6 +333,8 @@ public class Graph<T>
                 float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
                 if(tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
                 {
+                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
+ 
                     pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
                     pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current!;
                     pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
@@ -365,6 +373,7 @@ public class Graph<T>
 
     public List<Vertex<T>>  AStarAlgorithm(Vertex<T> start, Vertex<T> end, Func<Vertex<T>, Vertex<T>, double> heuristic)
     {
+        VisitedNodes = new List<Vertex<T>>();
         if (start == null || end == null) return null;
 
 
@@ -387,14 +396,19 @@ public class Graph<T>
 
         while(queue.Count > 0)
         {
+
             Vertex<T> current = queue.Dequeue();
+            VisitedNodes.Add(current);
+
             pathInfo.visited.Add(current);
 
             for (int i = 0; i < current.NeighborCount; i++)
             {
+
                 float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
                 if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
                 {
+
                     pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
                     pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current;
                     pathInfo.finalDistance[current] = pathInfo.distance[current] + (float)(heuristic(current, current.Neighbors[i].EndingPoint));
@@ -404,6 +418,7 @@ public class Graph<T>
                     && !queue.UnorderedItems.Contains((current.Neighbors[i].EndingPoint, 2/*gets thrown away by the comparer*/),
                                                 new NodeComparer<T>()))
                 {
+
                     pathInfo.visited.Add(current.Neighbors[i].EndingPoint);
                     queue.Enqueue(current.Neighbors[i].EndingPoint, pathInfo.finalDistance[current.Neighbors[i].EndingPoint]);
                 }
@@ -423,6 +438,17 @@ public class Graph<T>
         path.Reverse();
 
         return path;
+    }
+
+    public void RandomizeGraph() {
+        Random rand = new Random();
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            for (int j = 0; j < vertices[i].NeighborCount; j++)
+            {
+                vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 5;
+            }
+        }
     }
 
 

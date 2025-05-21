@@ -34,11 +34,12 @@ public class Game1 : Game
     private Random random;
     private int currentPathIndex = 0;
     private float timeToNextSquare = 0;
-    private float animationSpeed = 30f;
+    private float animationSpeed = 10f;
     private bool animationInProgress = false;
     private float lastPathCost = 0;
     private bool shouldDrawPath;
     private List<Vertex<Point>> pathList;
+    private bool hasClickedRandomizeButton = false;
     //textures ands fonts
     SpriteFont distanceFont;
     SpriteFont pathCostFont;
@@ -194,6 +195,14 @@ public class Game1 : Game
 
             }
         }
+        // Check if the mouse is over the randomize button
+        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            hasClickedRandomizeButton = true;
+            graph.RandomizeGraph();
+            shouldDrawPath = false;
+        }
         base.Update(gameTime);
         previousState = mouseState;
     }
@@ -205,7 +214,9 @@ public class Game1 : Game
         spriteBatch.Begin();
 
         DrawGrid();
+        DrawVisitedPath(spriteBatch);
         DrawPath(spriteBatch);
+        DrawRandomizeButton();
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
@@ -310,6 +321,32 @@ public class Game1 : Game
 
     }
 
+    public void DrawRandomizeButton()
+    {
+        // Draw the button
+        Rectangle buttonRect = new Rectangle(0, 0, screenMargin + 10, 75);
+        spriteBatch.FillRectangle(buttonRect, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "Randomize", new Vector2(0, 0), Color.White);
+
+
+    }
+
+
+    public void DrawVisitedPath(SpriteBatch spriteBatch)
+    {
+        if(shouldDrawPath) {
+            for(int i = 0; i < graph.VisitedNodes.Count; i++)
+            {
+                Rectangle drawRect = new Rectangle(
+                    graph.VisitedNodes[i].Value.X * gridSize + screenMargin, 
+                    graph.VisitedNodes[i].Value.Y * gridSize + screenMargin, 
+                    gridSize, gridSize);
+                
+                spriteBatch.DrawRectangle(drawRect, Color.Yellow);
+            }
+        }
+
+    }
     public void DrawPath(SpriteBatch spriteBatch)
     {
         if (shouldDrawPath && pathList != null && pathList.Count > 0)
@@ -324,7 +361,7 @@ public class Game1 : Game
                     pathList[i].Value.Y * gridSize + screenMargin, 
                     gridSize, gridSize);
                 
-                spriteBatch.DrawRectangle(drawRect, Color.Blue);
+                spriteBatch.FillRectangle(drawRect, Color.Blue * 0.5f);
             }
         }
     }
