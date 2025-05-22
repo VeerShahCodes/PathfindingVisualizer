@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj": {}
+    "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj": {}
   },
   "projects": {
-    "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj": {
+    "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+        "projectUniqueName": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
         "projectName": "PathfindingVisualizer",
-        "projectPath": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+        "projectPath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
         "packagesPath": "C:\\Users\\shahv\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
+        "outputPath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
