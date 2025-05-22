@@ -54,6 +54,9 @@ public class Game1 : Game
     Rectangle aStarButton;
     Rectangle breadthFirstButton;
     Rectangle depthFirstButton;
+    Rectangle obstacleButton;
+
+    bool isOnObstacleMode = false;
 
     private String methodName = "A*";
     public Game1()
@@ -70,7 +73,7 @@ public class Game1 : Game
         shouldDrawPath = false;
         pathList = new List<Vertex<Point>>();
 
-        gridSize = 20;
+        gridSize = 50;
         screenMargin = 125;
         screenHeight = 750;
         screenWidth = 750;
@@ -82,8 +85,9 @@ public class Game1 : Game
         aStarButton = new Rectangle(0, 200, screenMargin, 75);
         breadthFirstButton = new Rectangle(0, 300, screenMargin, 75);
         depthFirstButton = new Rectangle(0, 400, screenMargin, 75);
+        obstacleButton = new Rectangle(0, 500, screenMargin, 75);
         fontScale = gridSize / 50f;
-
+        List<Vertex<Point>> obstaclePoints = new List<Vertex<Point>>();
         isFirstSelection = true;
 
         startingBlock = new Rectangle();
@@ -164,7 +168,12 @@ public class Game1 : Game
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && hoveredBox == rect)
                 {
-                    if (isFirstSelection)
+                    if(isOnObstacleMode) {
+                        Vertex<Point> vertex = graph.Search(new Point((hoveredBox.Location.X - screenMargin) / gridSize, (hoveredBox.Location.Y - screenMargin) / gridSize));
+                        if(!graph.obstaclePoints.Contains(vertex.Value)) graph.obstaclePoints.Add(vertex.Value);
+                        else graph.obstaclePoints.Remove(vertex.Value);
+                    }
+                    else if (isFirstSelection)
                     {
                         startingBlock = hoveredBox;
                         isFirstSelection = false;
@@ -260,6 +269,12 @@ public class Game1 : Game
         {
             methodName = "DFS";
         }
+
+        buttonRect = obstacleButton;
+        if(mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            isOnObstacleMode = !isOnObstacleMode;
+        }
         base.Update(gameTime);
         previousState = mouseState;
 
@@ -279,6 +294,7 @@ public class Game1 : Game
         DrawAStarButton();
         DrawBreadthFirstButton();
         DrawDepthFirstButton();
+        DrawObstacleButton();
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
@@ -296,9 +312,14 @@ public class Game1 : Game
             {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
+                
                 if (rect.Intersects(hoveredBox))
                 {
-                    if (isFirstSelection)
+                    if(isOnObstacleMode) {
+                        color = Color.Black;
+                        spriteBatch.FillRectangle(rect, color);
+                    }
+                    else if (isFirstSelection)
                     {
                         color = Color.LightGreen;
                         spriteBatch.FillRectangle(rect, color);
@@ -311,6 +332,11 @@ public class Game1 : Game
 
 
                 }
+                else if(graph.obstaclePoints.Contains(new Point((rect.Location.X - screenMargin) / gridSize, (rect.Location.Y - screenMargin) / gridSize)))
+                {
+                    spriteBatch.FillRectangle(rect, Color.Black);
+                }
+
                 else if (rect == startingBlock)
                 {
                     spriteBatch.FillRectangle(rect, Color.LightGreen);
@@ -323,6 +349,8 @@ public class Game1 : Game
                 {
                     spriteBatch.DrawRectangle(rect, color);
                 }
+
+
 
             }
         }
@@ -410,6 +438,21 @@ public class Game1 : Game
         spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(0, 300), Color.White);
     }
 
+    public void DrawObstacleButton()
+    {
+        if (!isOnObstacleMode)
+        {
+            spriteBatch.FillRectangle(obstacleButton, Color.Red);
+            spriteBatch.DrawString(pathCostFont, "Obstacle Mode", new Vector2(0, 500), Color.White);
+        }
+        else
+        {
+            spriteBatch.FillRectangle(obstacleButton, Color.Green);
+            spriteBatch.DrawString(pathCostFont, "Obstacle Mode", new Vector2(0, 500), Color.White);
+        }
+
+    }
+
     public void DrawDepthFirstButton()
     {
         spriteBatch.FillRectangle(depthFirstButton, Color.Gray);
@@ -443,11 +486,12 @@ public class Game1 : Game
                 var start = pathList[i].Value;
                 var end = pathList[i + 1].Value;
 
-                var startPos = new Vector2(start.X * gridSize + screenMargin + gridSize / 2f, start.Y * gridSize + screenMargin + gridSize / 2f);
-                var endPos = new Vector2(end.X * gridSize + screenMargin + gridSize / 2f, end.Y * gridSize + screenMargin + gridSize / 2f);
+                var startPos = new Vector2(start.X * gridSize + screenMargin, start.Y * gridSize + screenMargin);
+                var endPos = new Vector2(end.X * gridSize + screenMargin, end.Y * gridSize + screenMargin);
 
                 
                 spriteBatch.DrawLine(startPos, endPos, Color.Blue, 4f); 
+                spriteBatch.FillRectangle(new Rectangle(startPos.ToPoint(), new Point(gridSize, gridSize)), Color.Gray * 0.5f);
             }
         }
     }
