@@ -422,19 +422,19 @@ public class Game1 : Game
 
     public void DrawDijkstraButton()
     {
-        spriteBatch.FillRectangle(dijkstraButton, Color.Gray);
+        spriteBatch.FillRectangle(dijkstraButton, Color.Red);
         spriteBatch.DrawString(pathCostFont, "Dijkstra", new Vector2(0, 100), Color.White);
     }
 
     public void DrawAStarButton()
     {
-        spriteBatch.FillRectangle(aStarButton, Color.Gray);
+        spriteBatch.FillRectangle(aStarButton, Color.Red);
         spriteBatch.DrawString(pathCostFont, "A*", new Vector2(0, 200), Color.White);
     }
 
     public void DrawBreadthFirstButton()
     {
-        spriteBatch.FillRectangle(breadthFirstButton, Color.Gray);
+        spriteBatch.FillRectangle(breadthFirstButton, Color.Red);
         spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(0, 300), Color.White);
     }
 
@@ -455,7 +455,7 @@ public class Game1 : Game
 
     public void DrawDepthFirstButton()
     {
-        spriteBatch.FillRectangle(depthFirstButton, Color.Gray);
+        spriteBatch.FillRectangle(depthFirstButton, Color.Red);
         spriteBatch.DrawString(pathCostFont, "DFS", new Vector2(0, 400), Color.White);
     }
 
