@@ -13,5 +13,15 @@
     "C:\\Users\\shahv\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
     "C:\\Users\\shahv\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

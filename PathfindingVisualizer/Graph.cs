@@ -38,10 +38,13 @@ public class Graph<T>
 
     public int VertexCount => vertices.Count;
 
+    public List<T> obstaclePoints;
+
     public Graph()
     {
         VisitedNodes = new List<Vertex<T>>();
         vertices = new List<Vertex<T>>();
+        obstaclePoints = new List<T>();
     }
 
     private void AddVertex(Vertex<T>  vertex)
@@ -220,12 +223,16 @@ public class Graph<T>
 
             for (int i = 0; i < current.NeighborCount; i++)
             {
-                if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
+                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
-                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
-                    queue.Enqueue(current.Neighbors[i].EndingPoint);
-                    previousVertex[current.Neighbors[i].EndingPoint] = current;
+                    if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
+                    {
+                        VisitedNodes.Add(current.Neighbors[i].EndingPoint);
+                        queue.Enqueue(current.Neighbors[i].EndingPoint);
+                        previousVertex[current.Neighbors[i].EndingPoint] = current;
+                    }
                 }
+
             }
         }
         return null;
@@ -268,12 +275,16 @@ public class Graph<T>
 
             for(int i = current.NeighborCount - 1; i > -1; i--)
             {
-                if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
+                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
-                    VisitedNodes.Add(current.Neighbors[i].EndingPoint);
-                    stack.Push(current.Neighbors[i].EndingPoint);
-                    previousVertex[current.Neighbors[i].EndingPoint] = current;
+                    if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
+                    {
+                        VisitedNodes.Add(current.Neighbors[i].EndingPoint);
+                        stack.Push(current.Neighbors[i].EndingPoint);
+                        previousVertex[current.Neighbors[i].EndingPoint] = current;
+                    }
                 }
+
             } 
         }
 
@@ -334,24 +345,34 @@ public class Graph<T>
             }
             for (int i = 0; i < current.NeighborCount; i++)
             {
-                float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
-                if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
+                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
+                      
+                    float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
+                    if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
+                    {
 
-                    pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
-                    pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current!;
-                    pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
+                        pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
+                        pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current!;
+                        pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
+                    }
+
                 }
+
             }
 
             for(int i = 0; i < current.NeighborCount; i++)
             {
-                if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)
-                    && !queue.UnorderedItems.AsEnumerable().Contains((current.Neighbors[i].EndingPoint, 2/*gets thrown away by the comparer, soi we don't care what it is*/),
-                                                                    new NodeComparer<T>()))
+                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
-                    queue.Enqueue(current.Neighbors[i].EndingPoint, pathInfo.distance[current.Neighbors[i].EndingPoint]);
+                     if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)
+                        && !queue.UnorderedItems.AsEnumerable().Contains((current.Neighbors[i].EndingPoint, 2/*gets thrown away by the comparer, soi we don't care what it is*/),
+                                                                        new NodeComparer<T>()))
+                    {
+                        queue.Enqueue(current.Neighbors[i].EndingPoint, pathInfo.distance[current.Neighbors[i].EndingPoint]);
+                    }
                 }
+
             }
 
             pathInfo.visited.Add(current);
@@ -412,23 +433,27 @@ public class Graph<T>
             for (int i = 0; i < current.NeighborCount; i++)
             {
 
-                float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
-                if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
-                {
+                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value)) {
+                    float tentativeDistance = pathInfo.distance[current] + current.Neighbors[i].Distance;
+                    if (tentativeDistance < pathInfo.distance[current.Neighbors[i].EndingPoint])
+                    {
 
-                    pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
-                    pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current;
-                    pathInfo.finalDistance[current.Neighbors[i].EndingPoint] = pathInfo.distance[current.Neighbors[i].EndingPoint] + (float)(heuristic(current.Neighbors[i].EndingPoint, end));
-                    pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
-                }
-                if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)
-                    && !queue.UnorderedItems.Contains((current.Neighbors[i].EndingPoint, 2/*gets thrown away by the comparer*/),
-                                                new NodeComparer<T>()))
-                {
+                        pathInfo.distance[current.Neighbors[i].EndingPoint] = tentativeDistance;
+                        pathInfo.previousVertex[current.Neighbors[i].EndingPoint] = current;
+                        pathInfo.finalDistance[current.Neighbors[i].EndingPoint] = pathInfo.distance[current.Neighbors[i].EndingPoint] + (float)(heuristic(current.Neighbors[i].EndingPoint, end));
+                        pathInfo.visited.Remove(current.Neighbors[i].EndingPoint);
+                    }
+                    if (!pathInfo.visited.Contains(current.Neighbors[i].EndingPoint)
+                        && !queue.UnorderedItems.Contains((current.Neighbors[i].EndingPoint, 2/*gets thrown away by the comparer*/),
+                                                    new NodeComparer<T>()))
+                    {
 
-                    pathInfo.visited.Add(current.Neighbors[i].EndingPoint);
-                    queue.Enqueue(current.Neighbors[i].EndingPoint, pathInfo.finalDistance[current.Neighbors[i].EndingPoint]);
+                        pathInfo.visited.Add(current.Neighbors[i].EndingPoint);
+                        queue.Enqueue(current.Neighbors[i].EndingPoint, pathInfo.finalDistance[current.Neighbors[i].EndingPoint]);
+                    }
                 }
+
+
             }
         }
         Vertex<T> theCurrentest = end;
