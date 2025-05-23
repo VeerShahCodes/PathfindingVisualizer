@@ -163,6 +163,19 @@ public class Game1 : Game
         mouseX = ((mouseState.X - screenMargin) / gridSize) * gridSize + screenMargin;
         mouseY = ((mouseState.Y - screenMargin) / gridSize) * gridSize + screenMargin;
         hoveredBox = new Rectangle(mouseX, mouseY, gridSize, gridSize);
+        if (mouseState.X >= screenMargin &&
+            mouseState.X < screenWidth - screenMargin &&
+            mouseState.Y >= screenMargin &&
+            mouseState.Y < screenHeight - screenMargin)
+        {
+            mouseX = ((mouseState.X - screenMargin) / gridSize) * gridSize + screenMargin;
+            mouseY = ((mouseState.Y - screenMargin) / gridSize) * gridSize + screenMargin;
+            hoveredBox = new Rectangle(mouseX, mouseY, gridSize, gridSize);
+        }
+        else
+        {
+            hoveredBox = Rectangle.Empty; 
+        }
         for (int rows = screenMargin; rows < screenWidth - screenMargin; rows += gridSize)
         {
             for (int cols = screenMargin; cols < screenHeight - screenMargin; cols += gridSize)
@@ -170,9 +183,10 @@ public class Game1 : Game
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && hoveredBox == rect)
                 {
-                    if(isOnObstacleMode) {
+                    if (isOnObstacleMode)
+                    {
                         Vertex<Point> vertex = graph.Search(new Point((hoveredBox.Location.X - screenMargin) / gridSize, (hoveredBox.Location.Y - screenMargin) / gridSize));
-                        if(!graph.obstaclePoints.Contains(vertex.Value)) graph.obstaclePoints.Add(vertex.Value);
+                        if (!graph.obstaclePoints.Contains(vertex.Value)) graph.obstaclePoints.Add(vertex.Value);
                         else graph.obstaclePoints.Remove(vertex.Value);
                     }
                     else if (isFirstSelection)
@@ -185,9 +199,8 @@ public class Game1 : Game
                         endingBlock = hoveredBox;
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
-                        //pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         if (methodName == "A*")
-                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
+                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Euclidean);
                         else if (methodName == "Dijkstra")
                             pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         else if (methodName == "DFS")
@@ -325,7 +338,6 @@ public class Game1 : Game
             {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
-
                 if (rect.Intersects(hoveredBox))
                 {
                     if (isOnObstacleMode)
@@ -363,6 +375,8 @@ public class Game1 : Game
                 {
                     spriteBatch.DrawRectangle(rect, color);
                 }
+                spriteBatch.DrawPoint(rect.X + gridSize / 2, rect.Y + gridSize / 2, Color.Black, 5f);
+
 
 
 
@@ -441,19 +455,40 @@ public class Game1 : Game
     }
     public void DrawDijkstraButton()
     {
-        spriteBatch.FillRectangle(dijkstraButton, Color.Red);
+        if(methodName == "Dijkstra")
+        {
+            spriteBatch.FillRectangle(dijkstraButton, Color.Green);
+        }
+        else
+        {
+            spriteBatch.FillRectangle(dijkstraButton, Color.Red);
+        }
         spriteBatch.DrawString(pathCostFont, "Dijkstra", new Vector2(0, 100), Color.White);
     }
 
     public void DrawAStarButton()
     {
-        spriteBatch.FillRectangle(aStarButton, Color.Red);
+        if (methodName == "A*")
+        {
+            spriteBatch.FillRectangle(aStarButton, Color.Green);
+        }
+        else
+        {
+            spriteBatch.FillRectangle(aStarButton, Color.Red);
+        }
         spriteBatch.DrawString(pathCostFont, "A*", new Vector2(0, 200), Color.White);
     }
 
     public void DrawBreadthFirstButton()
     {
-        spriteBatch.FillRectangle(breadthFirstButton, Color.Red);
+        if (methodName == "BFS")
+        {
+            spriteBatch.FillRectangle(breadthFirstButton, Color.Green);
+        }
+        else
+        {
+            spriteBatch.FillRectangle(breadthFirstButton, Color.Red);
+        }
         spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(0, 300), Color.White);
     }
 
@@ -474,7 +509,14 @@ public class Game1 : Game
 
     public void DrawDepthFirstButton()
     {
-        spriteBatch.FillRectangle(depthFirstButton, Color.Red);
+        if (methodName == "DFS")
+        {
+            spriteBatch.FillRectangle(depthFirstButton, Color.Green);
+        }
+        else
+        {
+            spriteBatch.FillRectangle(depthFirstButton, Color.Red);
+        }
         spriteBatch.DrawString(pathCostFont, "DFS", new Vector2(0, 400), Color.White);
     }
 
