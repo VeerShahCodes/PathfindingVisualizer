@@ -55,6 +55,7 @@ public class Game1 : Game
     Rectangle breadthFirstButton;
     Rectangle depthFirstButton;
     Rectangle obstacleButton;
+    Rectangle clearButton;
 
     bool isOnObstacleMode = false;
 
@@ -86,6 +87,7 @@ public class Game1 : Game
         breadthFirstButton = new Rectangle(0, 300, screenMargin, 75);
         depthFirstButton = new Rectangle(0, 400, screenMargin, 75);
         obstacleButton = new Rectangle(0, 500, screenMargin, 75);
+        clearButton = new Rectangle(0, 600, screenMargin, 75);
         fontScale = gridSize / 50f;
         List<Vertex<Point>> obstaclePoints = new List<Vertex<Point>>();
         isFirstSelection = true;
@@ -93,8 +95,8 @@ public class Game1 : Game
         startingBlock = new Rectangle();
         endingBlock = new Rectangle();
 
-        graphWidth = (screenWidth - screenMargin * 2) / gridSize + 1;
-        graphHeight = (screenHeight - screenMargin * 2) / gridSize + 1;
+        graphWidth = (screenWidth - screenMargin * 2) / gridSize;
+        graphHeight = (screenHeight - screenMargin * 2) / gridSize;
         //init graph
         graph = new Graph<Point>();
 
@@ -275,6 +277,16 @@ public class Game1 : Game
         {
             isOnObstacleMode = !isOnObstacleMode;
         }
+        buttonRect = clearButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            isFirstSelection = true;
+            startingBlock = new Rectangle();
+            endingBlock = new Rectangle();
+            pathList = new List<Vertex<Point>>();
+            shouldDrawPath = false;
+            graph.obstaclePoints.Clear();
+        }
         base.Update(gameTime);
         previousState = mouseState;
 
@@ -295,6 +307,7 @@ public class Game1 : Game
         DrawBreadthFirstButton();
         DrawDepthFirstButton();
         DrawObstacleButton();
+        DrawClearButton();
         spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
 
         base.Draw(gameTime);
@@ -312,10 +325,11 @@ public class Game1 : Game
             {
                 Rectangle rect = new Rectangle(rows, cols, gridSize, gridSize);
                 Color color = Color.LightGray;
-                
+
                 if (rect.Intersects(hoveredBox))
                 {
-                    if(isOnObstacleMode) {
+                    if (isOnObstacleMode)
+                    {
                         color = Color.Black;
                         spriteBatch.FillRectangle(rect, color);
                     }
@@ -332,9 +346,9 @@ public class Game1 : Game
 
 
                 }
-                else if(graph.obstaclePoints.Contains(new Point((rect.Location.X - screenMargin) / gridSize, (rect.Location.Y - screenMargin) / gridSize)))
+                else if (graph.obstaclePoints.Contains(new Point((rect.Location.X - screenMargin) / gridSize, (rect.Location.Y - screenMargin) / gridSize)))
                 {
-                    spriteBatch.FillRectangle(rect, Color.Black);
+                    spriteBatch.FillRectangle(rect, Color.Gray);
                 }
 
                 else if (rect == startingBlock)
@@ -409,6 +423,7 @@ public class Game1 : Game
         }
 
 
+
     }
 
     public void DrawRandomizeButton()
@@ -419,7 +434,11 @@ public class Game1 : Game
 
 
     }
-
+    public void DrawClearButton()
+    {
+        spriteBatch.FillRectangle(clearButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "Clear", new Vector2(0, 600), Color.White);
+    }
     public void DrawDijkstraButton()
     {
         spriteBatch.FillRectangle(dijkstraButton, Color.Red);
@@ -443,12 +462,12 @@ public class Game1 : Game
         if (!isOnObstacleMode)
         {
             spriteBatch.FillRectangle(obstacleButton, Color.Red);
-            spriteBatch.DrawString(pathCostFont, "Obstacle Mode", new Vector2(0, 500), Color.White);
+            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(0, 500), Color.White);
         }
         else
         {
             spriteBatch.FillRectangle(obstacleButton, Color.Green);
-            spriteBatch.DrawString(pathCostFont, "Obstacle Mode", new Vector2(0, 500), Color.White);
+            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(0, 500), Color.White);
         }
 
     }
@@ -477,23 +496,29 @@ public class Game1 : Game
     }
     public void DrawPath(SpriteBatch spriteBatch)
     {
-        if (shouldDrawPath && pathList != null && pathList.Count > 0)
+    if (shouldDrawPath && pathList != null && pathList.Count > 0)
+    {
+        int visibleSquares = Math.Min(currentPathIndex, pathList.Count);
+
+        for (int i = 0; i < visibleSquares - 1; i++)
         {
-            int visibleSquares = Math.Min(currentPathIndex, pathList.Count);
+            var start = pathList[i].Value;
+            var end = pathList[i + 1].Value;
 
-            for (int i = 0; i < visibleSquares - 1; i++)
-            {
-                var start = pathList[i].Value;
-                var end = pathList[i + 1].Value;
 
-                var startPos = new Vector2(start.X * gridSize + screenMargin, start.Y * gridSize + screenMargin);
-                var endPos = new Vector2(end.X * gridSize + screenMargin, end.Y * gridSize + screenMargin);
 
-                
-                spriteBatch.DrawLine(startPos, endPos, Color.Blue, 4f); 
-                spriteBatch.FillRectangle(new Rectangle(startPos.ToPoint(), new Point(gridSize, gridSize)), Color.Gray * 0.5f);
-            }
+            var startPos = new Vector2(
+                start.X * gridSize + screenMargin + gridSize / 2f,
+                start.Y * gridSize + screenMargin + gridSize / 2f
+            );
+            var endPos = new Vector2(
+                end.X * gridSize + screenMargin + gridSize / 2f,
+                end.Y * gridSize + screenMargin + gridSize / 2f
+            );
+
+            spriteBatch.DrawLine(startPos, endPos, Color.Blue, 4f);
         }
+    }
     }
     public void StartPathAnimation()
     {

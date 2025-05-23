@@ -427,7 +427,10 @@ public class Graph<T>
                 VisitedNodes.Add(current);
             }
      
-
+            if (current.Equals(end))
+            {
+                break;
+            }
 
 
             for (int i = 0; i < current.NeighborCount; i++)
@@ -507,7 +510,7 @@ public class Graph<T>
     {
         int dx = Math.Abs(node.Value.X - goal.Value.X);
         int dy = Math.Abs(node.Value.Y - goal.Value.Y);
-        return 1 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+        return 3.0 * (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
     }
 
     public double Euclidean(Vertex<Point> node, Vertex<Point> goal)
