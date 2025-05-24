@@ -75,9 +75,9 @@ public class Game1 : Game
         pathList = new List<Vertex<Point>>();
 
         gridSize = 50;
-        screenMargin = 125;
-        screenHeight = 750;
-        screenWidth = 750;
+        screenMargin = 150;
+        screenHeight = 1000;
+        screenWidth = 1000;
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
@@ -189,7 +189,7 @@ public class Game1 : Game
                         if (!graph.obstaclePoints.Contains(vertex.Value)) graph.obstaclePoints.Add(vertex.Value);
                         else graph.obstaclePoints.Remove(vertex.Value);
                     }
-                    else if (isFirstSelection)
+                    else if (isFirstSelection && !graph.obstaclePoints.Contains(new Point((hoveredBox.Location.X - screenMargin) / gridSize, (hoveredBox.Location.Y - screenMargin) / gridSize) ))
                     {
                         startingBlock = hoveredBox;
                         isFirstSelection = false;
