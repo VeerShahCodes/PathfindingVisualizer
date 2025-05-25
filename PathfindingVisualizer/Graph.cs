@@ -487,6 +487,17 @@ public class Graph<T>
         }
     }
 
+    public void ResetPathCosts()
+    {
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            for (int j = 0; j < vertices[i].NeighborCount; j++)
+            {
+                vertices[i].Neighbors[j].Distance = 1f;
+            }
+        }
+    }
+
 
 
 

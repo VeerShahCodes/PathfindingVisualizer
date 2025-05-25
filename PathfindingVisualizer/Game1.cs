@@ -56,6 +56,7 @@ public class Game1 : Game
     Rectangle depthFirstButton;
     Rectangle obstacleButton;
     Rectangle clearButton;
+    Rectangle resetButton;
 
     bool isOnObstacleMode = false;
 
@@ -81,13 +82,14 @@ public class Game1 : Game
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
-        randomizeButton = new Rectangle(0, 0, screenMargin + 50, 75);
-        dijkstraButton = new Rectangle(0, 100, screenMargin, 75);
-        aStarButton = new Rectangle(0, 200, screenMargin, 75);
-        breadthFirstButton = new Rectangle(0, 300, screenMargin, 75);
-        depthFirstButton = new Rectangle(0, 400, screenMargin, 75);
+        randomizeButton = new Rectangle(screenMargin, 0, screenMargin + 50, 75);
+        dijkstraButton = new Rectangle(screenMargin * 2 + 30, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
+        aStarButton = new Rectangle(screenMargin, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
+        breadthFirstButton = new Rectangle(screenMargin * 3 + 60, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
+        depthFirstButton = new Rectangle(screenMargin * 4 + 90, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
         obstacleButton = new Rectangle(0, 500, screenMargin, 75);
-        clearButton = new Rectangle(0, 600, screenMargin, 75);
+        clearButton = new Rectangle(screenMargin * 3 + 110, 0, screenMargin, 75);
+        resetButton = new Rectangle(screenMargin * 2 + 80, 0, screenMargin, 75);
         fontScale = gridSize / 50f;
         List<Vertex<Point>> obstaclePoints = new List<Vertex<Point>>();
         isFirstSelection = true;
@@ -300,6 +302,12 @@ public class Game1 : Game
             shouldDrawPath = false;
             graph.obstaclePoints.Clear();
         }
+        buttonRect = resetButton;
+        if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
+        {
+            graph.ResetPathCosts();
+            
+        }
         base.Update(gameTime);
         previousState = mouseState;
 
@@ -308,13 +316,14 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
 
-        GraphicsDevice.Clear(Color.White);
+        GraphicsDevice.Clear(Color.CornflowerBlue);
         spriteBatch.Begin();
 
         DrawGrid();
         DrawVisitedPath(spriteBatch);
         DrawPath(spriteBatch);
         DrawRandomizeButton();
+        DrawResetButton();
         DrawDijkstraButton();
         DrawAStarButton();
         DrawBreadthFirstButton();
@@ -373,7 +382,9 @@ public class Game1 : Game
                 }
                 else
                 {
+                    spriteBatch.FillRectangle(rect, Color.White);
                     spriteBatch.DrawRectangle(rect, color);
+                    
                 }
                 spriteBatch.DrawPoint(rect.X + gridSize / 2, rect.Y + gridSize / 2, Color.Black, 5f);
 
@@ -440,18 +451,24 @@ public class Game1 : Game
 
     }
 
+    public void DrawResetButton()
+    {
+        spriteBatch.FillRectangle(resetButton, Color.Gray);
+        spriteBatch.DrawString(pathCostFont, "Reset", new Vector2(resetButton.X, resetButton.Y), Color.White);
+    }
+
     public void DrawRandomizeButton()
     {
         // Draw the button
         spriteBatch.FillRectangle(randomizeButton, Color.Gray);
-        spriteBatch.DrawString(pathCostFont, "Randomize", new Vector2(0, 0), Color.White);
+        spriteBatch.DrawString(pathCostFont, "Randomize", new Vector2(randomizeButton.X, randomizeButton.Y), Color.White);
 
 
     }
     public void DrawClearButton()
     {
         spriteBatch.FillRectangle(clearButton, Color.Gray);
-        spriteBatch.DrawString(pathCostFont, "Clear", new Vector2(0, 600), Color.White);
+        spriteBatch.DrawString(pathCostFont, "Clear", new Vector2(clearButton.X, clearButton.Y), Color.White);
     }
     public void DrawDijkstraButton()
     {
@@ -463,7 +480,7 @@ public class Game1 : Game
         {
             spriteBatch.FillRectangle(dijkstraButton, Color.Red);
         }
-        spriteBatch.DrawString(pathCostFont, "Dijkstra", new Vector2(0, 100), Color.White);
+        spriteBatch.DrawString(pathCostFont, "Dijkstra", new Vector2(dijkstraButton.X, dijkstraButton.Y), Color.White);
     }
 
     public void DrawAStarButton()
@@ -476,7 +493,7 @@ public class Game1 : Game
         {
             spriteBatch.FillRectangle(aStarButton, Color.Red);
         }
-        spriteBatch.DrawString(pathCostFont, "A*", new Vector2(0, 200), Color.White);
+        spriteBatch.DrawString(pathCostFont, "A*", new Vector2(aStarButton.X, aStarButton.Y), Color.White);
     }
 
     public void DrawBreadthFirstButton()
@@ -489,7 +506,7 @@ public class Game1 : Game
         {
             spriteBatch.FillRectangle(breadthFirstButton, Color.Red);
         }
-        spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(0, 300), Color.White);
+        spriteBatch.DrawString(pathCostFont, "BFS", new Vector2(breadthFirstButton.X, breadthFirstButton.Y), Color.White);
     }
 
     public void DrawObstacleButton()
@@ -497,12 +514,12 @@ public class Game1 : Game
         if (!isOnObstacleMode)
         {
             spriteBatch.FillRectangle(obstacleButton, Color.Red);
-            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(0, 500), Color.White);
+            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(obstacleButton.X, obstacleButton.Y), Color.White);
         }
         else
         {
             spriteBatch.FillRectangle(obstacleButton, Color.Green);
-            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(0, 500), Color.White);
+            spriteBatch.DrawString(pathCostFont, "Obstacle", new Vector2(obstacleButton.X, obstacleButton.Y), Color.White);
         }
 
     }
@@ -517,7 +534,7 @@ public class Game1 : Game
         {
             spriteBatch.FillRectangle(depthFirstButton, Color.Red);
         }
-        spriteBatch.DrawString(pathCostFont, "DFS", new Vector2(0, 400), Color.White);
+        spriteBatch.DrawString(pathCostFont, "DFS", new Vector2(depthFirstButton.X, depthFirstButton.Y), Color.White);
     }
 
     public void DrawVisitedPath(SpriteBatch spriteBatch)
