@@ -82,14 +82,27 @@ public class Game1 : Game
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
-        randomizeButton = new Rectangle(screenMargin, 0, screenMargin + 50, 75);
-        dijkstraButton = new Rectangle(screenMargin * 2 + 30, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        aStarButton = new Rectangle(screenMargin, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        breadthFirstButton = new Rectangle(screenMargin * 3 + 60, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        depthFirstButton = new Rectangle(screenMargin * 4 + 90, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        obstacleButton = new Rectangle(0, 500, screenMargin, 75);
-        clearButton = new Rectangle(screenMargin * 3 + 110, 0, screenMargin, 75);
-        resetButton = new Rectangle(screenMargin * 2 + 80, 0, screenMargin, 75);
+
+        int buttonWidth = 160;
+        int buttonHeight = 60;
+        int buttonSpacing = 30;
+
+        int topRowY = screenMargin / 2;
+        int totalTopWidth = buttonWidth * 4 + buttonSpacing * 3;
+        int topStartX = (screenWidth - totalTopWidth) / 2;
+        randomizeButton = new Rectangle(topStartX, topRowY, buttonWidth, buttonHeight);
+        resetButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 1, topRowY, buttonWidth, buttonHeight);
+        clearButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 2, topRowY, buttonWidth, buttonHeight);
+        obstacleButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 3, topRowY, buttonWidth, buttonHeight);
+
+        int bottomRowY = screenHeight - screenMargin + buttonHeight / 2;
+        int totalBottomWidth = buttonWidth * 4 + buttonSpacing * 3;
+        int bottomStartX = (screenWidth - totalBottomWidth) / 2;
+        aStarButton = new Rectangle(bottomStartX, bottomRowY, buttonWidth, buttonHeight);
+        dijkstraButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 1, bottomRowY, buttonWidth, buttonHeight);
+        breadthFirstButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 2, bottomRowY, buttonWidth, buttonHeight);
+        depthFirstButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 3, bottomRowY, buttonWidth, buttonHeight);
+
         fontScale = gridSize / 50f;
         List<Vertex<Point>> obstaclePoints = new List<Vertex<Point>>();
         isFirstSelection = true;
@@ -120,19 +133,15 @@ public class Game1 : Game
                 double b = 1;
                 double c = Math.Sqrt(2);
 
-                // Right
                 if (i < graphWidth - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
 
-                // Down
                 if (j < graphHeight - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
 
-                // Down-Right Diagonal
                 if (i < graphWidth - 1 && j < graphHeight - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
 
-                // Down-Left Diagonal
                 if (i > 0 && j < graphHeight - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
             }
@@ -222,14 +231,11 @@ public class Game1 : Game
 
                     if (timeToNextSquare <= 0)
                     {
-                        // Increment index and reset timer
                         currentPathIndex++;
                         timeToNextSquare = animationSpeed;
 
-                        // Log for debugging
                         System.Diagnostics.Debug.WriteLine($"Current Path Index: {currentPathIndex}/{pathList.Count}");
 
-                        // Check if we're done
                         if (currentPathIndex >= pathList.Count)
                         {
                             animationInProgress = false;
@@ -265,7 +271,6 @@ public class Game1 : Game
         buttonRect = dijkstraButton;
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
-            Console.WriteLine("Dijkstra button clicked");
             methodName = "Dijkstra";
         }
 
@@ -330,7 +335,7 @@ public class Game1 : Game
         DrawDepthFirstButton();
         DrawObstacleButton();
         DrawClearButton();
-        spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
+        spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 5), Color.White);
 
         base.Draw(gameTime);
         spriteBatch.End();
