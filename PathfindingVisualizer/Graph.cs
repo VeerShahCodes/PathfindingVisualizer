@@ -475,17 +475,7 @@ public class Graph<T>
         return path;
     }
 
-    public void RandomizeGraph() {
-        Random rand = new Random();
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            for (int j = 0; j < vertices[i].NeighborCount; j++)
-            {
-                //vertices[i].Neighbors[j].Distance = 10f;
-               vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 4 + 1;
-            }
-        }
-    }
+
 
     public void ResetPathCosts()
     {

@@ -264,7 +264,7 @@ public class Game1 : Game
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
             hasClickedRandomizeButton = true;
-            graph.RandomizeGraph();
+            RandomizeGraph();
             shouldDrawPath = false;
         }
         
@@ -415,10 +415,10 @@ public class Game1 : Game
                 if (rightEdge != null)
                 {
                     float originalValue = rightEdge.Distance;
-                    float rounded = (float)Math.Round(originalValue, 1);
+                    int rounded = (int)originalValue;
                     spriteBatch.DrawString(
                         distanceFont,
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        rounded.ToString(),
                         new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin),
                         Color.Black,
                         0f,
@@ -432,10 +432,10 @@ public class Game1 : Game
                 if (downEdge != null)
                 {
                     float originalValue = downEdge.Distance;
-                    float rounded = (float)Math.Round(originalValue, 1);
+                    int rounded = (int)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
                         distanceFont,
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        rounded.ToString(),
                         new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2),
                         Color.Black,
                         0f,
@@ -596,6 +596,46 @@ public class Game1 : Game
         visitedAnimationTimer = 0f;
         visitedAnimationInProgress = true;
 
+    }
+    public void RandomizeGraph() {
+        Random random = new Random();
+        for (int i = 0; i < graphWidth; i++)
+        {
+            for (int j = 0; j < graphHeight; j++)
+            {
+                double a = (int)(random.NextDouble() * 20 + 1);
+                double b = (int)(random.NextDouble() * 20 + 1);
+                double c = Math.Sqrt(a * a + b * b);
+
+                if (i < graphWidth - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j))).Distance = (float)a;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j)), graph.Search(new Point(i, j))).Distance = (float)a;
+
+                }
+
+                if (j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i, j + 1))).Distance = (float)b;
+                    graph.GetEdge(graph.Search(new Point(i, j + 1)), graph.Search(new Point(i, j))).Distance = (float)b;
+
+                }
+
+                if (i < graphWidth - 1 && j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j + 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+
+                if (i > 0 && j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i - 1, j + 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i - 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+            }
+        }
     }
 
 }
