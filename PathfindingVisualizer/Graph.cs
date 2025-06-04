@@ -201,7 +201,7 @@ public class Graph<T>
         queue.Enqueue(start);
         while(queue.Count > 0)
         {
-            Vertex<T>  current = queue.Dequeue();
+            Vertex<T> current = queue.Dequeue();
             if(current.Equals(end))
             {
                 List<Vertex<T>> path = new List<Vertex<T>>();
@@ -223,7 +223,10 @@ public class Graph<T>
 
             for (int i = 0; i < current.NeighborCount; i++)
             {
-                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
+
+
+
+                if (!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
                     if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
                     {
@@ -232,7 +235,6 @@ public class Graph<T>
                         previousVertex[current.Neighbors[i].EndingPoint] = current;
                     }
                 }
-
             }
         }
         return null;

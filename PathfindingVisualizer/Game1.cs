@@ -58,6 +58,8 @@ public class Game1 : Game
     Rectangle clearButton;
     Rectangle resetButton;
 
+    bool isRandomized = false;
+
     bool isOnObstacleMode = false;
 
     private String methodName = "A*";
@@ -139,11 +141,18 @@ public class Game1 : Game
                 if (j < graphHeight - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
 
+
+                if(i < graphWidth - 1 && j > 0)
+                    graph.AddEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
                 if (i < graphWidth - 1 && j < graphHeight - 1)
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
+                    graph.AddEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
 
                 if (i > 0 && j < graphHeight - 1)
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
+                    graph.AddEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
+                if(i > 0 && j > 0)
+                {
+                    graph.AddEdge(new Point(i, j), new Point(i - 1, j - 1), (float)c);
+                }
             }
         }
 
@@ -211,7 +220,15 @@ public class Game1 : Game
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         if (methodName == "A*")
-                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Euclidean);
+                            if (isRandomized)
+                            {
+                                pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), (a, b) => 0);
+
+                            }
+                            else
+                            {
+                                pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
+                            }
                         else if (methodName == "Dijkstra")
                             pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         else if (methodName == "DFS")
@@ -266,6 +283,7 @@ public class Game1 : Game
             hasClickedRandomizeButton = true;
             RandomizeGraph();
             shouldDrawPath = false;
+            isRandomized = true;
         }
         
         buttonRect = dijkstraButton;
@@ -311,6 +329,7 @@ public class Game1 : Game
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
             graph.ResetPathCosts();
+            isRandomized = false;
             
         }
         base.Update(gameTime);
@@ -603,8 +622,8 @@ public class Game1 : Game
         {
             for (int j = 0; j < graphHeight; j++)
             {
-                double a = (int)(random.NextDouble() * 20 + 1);
-                double b = (int)(random.NextDouble() * 20 + 1);
+                double a = (double)(random.NextDouble() * 20 + 1);
+                double b = (double)(random.NextDouble() * 20 + 1);
                 double c = Math.Sqrt(a * a + b * b);
 
                 if (i < graphWidth - 1)
@@ -627,11 +646,23 @@ public class Game1 : Game
                     graph.GetEdge(graph.Search(new Point(i + 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
 
                 }
+                if(i < graphWidth - 1 && j > 0)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j - 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j - 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
 
                 if (i > 0 && j < graphHeight - 1)
                 {
                     graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i - 1, j + 1))).Distance = (float)c;
                     graph.GetEdge(graph.Search(new Point(i - 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+                if(i > 0 && j > 0)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i - 1, j - 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i - 1, j - 1)), graph.Search(new Point(i, j))).Distance = (float)c;
 
                 }
             }
