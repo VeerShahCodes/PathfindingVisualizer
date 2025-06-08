@@ -366,23 +366,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\shahv\\.nuget\\packages\\": {},
+    "C:\\Users\\VSHA0641\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "projectUniqueName": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
       "projectName": "PathfindingVisualizer",
-      "projectPath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
-      "packagesPath": "C:\\Users\\shahv\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
+      "projectPath": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\PathfindingVisualizer.csproj",
+      "packagesPath": "C:\\Users\\VSHA0641\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\VSHA0641\\Documents\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\shahv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\VSHA0641\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -447,13 +447,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\shahv\\OneDrive\\Documents\\Visual Studio Code\\PathfindingVisualizer\\PathfindingVisualizer\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
-    }
-  ]
+  }
 }

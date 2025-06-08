@@ -201,7 +201,7 @@ public class Graph<T>
         queue.Enqueue(start);
         while(queue.Count > 0)
         {
-            Vertex<T>  current = queue.Dequeue();
+            Vertex<T> current = queue.Dequeue();
             if(current.Equals(end))
             {
                 List<Vertex<T>> path = new List<Vertex<T>>();
@@ -223,7 +223,10 @@ public class Graph<T>
 
             for (int i = 0; i < current.NeighborCount; i++)
             {
-                if(!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
+
+
+
+                if (!obstaclePoints.Contains(current.Neighbors[i].EndingPoint.Value))
                 {
                     if (!previousVertex.ContainsKey(current.Neighbors[i].EndingPoint))
                     {
@@ -232,7 +235,6 @@ public class Graph<T>
                         previousVertex[current.Neighbors[i].EndingPoint] = current;
                     }
                 }
-
             }
         }
         return null;
@@ -475,17 +477,7 @@ public class Graph<T>
         return path;
     }
 
-    public void RandomizeGraph() {
-        Random rand = new Random();
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            for (int j = 0; j < vertices[i].NeighborCount; j++)
-            {
-                //vertices[i].Neighbors[j].Distance = 10f;
-               vertices[i].Neighbors[j].Distance = (float)rand.NextDouble() * 4 + 1;
-            }
-        }
-    }
+
 
     public void ResetPathCosts()
     {

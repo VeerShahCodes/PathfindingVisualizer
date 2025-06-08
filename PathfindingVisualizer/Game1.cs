@@ -58,6 +58,8 @@ public class Game1 : Game
     Rectangle clearButton;
     Rectangle resetButton;
 
+    bool isRandomized = false;
+
     bool isOnObstacleMode = false;
 
     private String methodName = "A*";
@@ -82,14 +84,27 @@ public class Game1 : Game
         graphics.PreferredBackBufferHeight = screenHeight;
         graphics.PreferredBackBufferWidth = screenWidth;
         graphics.ApplyChanges();
-        randomizeButton = new Rectangle(screenMargin, 0, screenMargin + 50, 75);
-        dijkstraButton = new Rectangle(screenMargin * 2 + 30, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        aStarButton = new Rectangle(screenMargin, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        breadthFirstButton = new Rectangle(screenMargin * 3 + 60, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        depthFirstButton = new Rectangle(screenMargin * 4 + 90, screenHeight - screenMargin + screenMargin / 4, screenMargin, 75);
-        obstacleButton = new Rectangle(0, 500, screenMargin, 75);
-        clearButton = new Rectangle(screenMargin * 3 + 110, 0, screenMargin, 75);
-        resetButton = new Rectangle(screenMargin * 2 + 80, 0, screenMargin, 75);
+
+        int buttonWidth = 160;
+        int buttonHeight = 60;
+        int buttonSpacing = 30;
+
+        int topRowY = screenMargin / 2;
+        int totalTopWidth = buttonWidth * 4 + buttonSpacing * 3;
+        int topStartX = (screenWidth - totalTopWidth) / 2;
+        randomizeButton = new Rectangle(topStartX, topRowY, buttonWidth, buttonHeight);
+        resetButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 1, topRowY, buttonWidth, buttonHeight);
+        clearButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 2, topRowY, buttonWidth, buttonHeight);
+        obstacleButton = new Rectangle(topStartX + (buttonWidth + buttonSpacing) * 3, topRowY, buttonWidth, buttonHeight);
+
+        int bottomRowY = screenHeight - screenMargin + buttonHeight / 2;
+        int totalBottomWidth = buttonWidth * 4 + buttonSpacing * 3;
+        int bottomStartX = (screenWidth - totalBottomWidth) / 2;
+        aStarButton = new Rectangle(bottomStartX, bottomRowY, buttonWidth, buttonHeight);
+        dijkstraButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 1, bottomRowY, buttonWidth, buttonHeight);
+        breadthFirstButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 2, bottomRowY, buttonWidth, buttonHeight);
+        depthFirstButton = new Rectangle(bottomStartX + (buttonWidth + buttonSpacing) * 3, bottomRowY, buttonWidth, buttonHeight);
+
         fontScale = gridSize / 50f;
         List<Vertex<Point>> obstaclePoints = new List<Vertex<Point>>();
         isFirstSelection = true;
@@ -120,21 +135,24 @@ public class Game1 : Game
                 double b = 1;
                 double c = Math.Sqrt(2);
 
-                // Right
                 if (i < graphWidth - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j), (float)a);
 
-                // Down
                 if (j < graphHeight - 1)
                     graph.AddUndirectedEdge(new Point(i, j), new Point(i, j + 1), (float)b);
 
-                // Down-Right Diagonal
-                if (i < graphWidth - 1 && j < graphHeight - 1)
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
 
-                // Down-Left Diagonal
+                if(i < graphWidth - 1 && j > 0)
+                    graph.AddEdge(new Point(i, j), new Point(i + 1, j - 1), (float)c);
+                if (i < graphWidth - 1 && j < graphHeight - 1)
+                    graph.AddEdge(new Point(i, j), new Point(i + 1, j + 1), (float)c);
+
                 if (i > 0 && j < graphHeight - 1)
-                    graph.AddUndirectedEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
+                    graph.AddEdge(new Point(i, j), new Point(i - 1, j + 1), (float)c);
+                if(i > 0 && j > 0)
+                {
+                    graph.AddEdge(new Point(i, j), new Point(i - 1, j - 1), (float)c);
+                }
             }
         }
 
@@ -202,7 +220,15 @@ public class Game1 : Game
                         Point firstPoint = new Point((startingBlock.Location.X - screenMargin) / gridSize, (startingBlock.Location.Y - screenMargin) / gridSize);
                         Point lastPoint = new Point((endingBlock.Location.X - screenMargin) / gridSize, (endingBlock.Location.Y - screenMargin) / gridSize);
                         if (methodName == "A*")
-                            pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Euclidean);
+                            if (isRandomized)
+                            {
+                                pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), (a, b) => 0);
+
+                            }
+                            else
+                            {
+                                pathList = graph.AStarAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint), graph.Diagonal);
+                            }
                         else if (methodName == "Dijkstra")
                             pathList = graph.DijkstraAlgorithm(graph.Search(firstPoint), graph.Search(lastPoint));
                         else if (methodName == "DFS")
@@ -222,14 +248,11 @@ public class Game1 : Game
 
                     if (timeToNextSquare <= 0)
                     {
-                        // Increment index and reset timer
                         currentPathIndex++;
                         timeToNextSquare = animationSpeed;
 
-                        // Log for debugging
                         System.Diagnostics.Debug.WriteLine($"Current Path Index: {currentPathIndex}/{pathList.Count}");
 
-                        // Check if we're done
                         if (currentPathIndex >= pathList.Count)
                         {
                             animationInProgress = false;
@@ -258,14 +281,14 @@ public class Game1 : Game
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
             hasClickedRandomizeButton = true;
-            graph.RandomizeGraph();
+            RandomizeGraph();
             shouldDrawPath = false;
+            isRandomized = true;
         }
         
         buttonRect = dijkstraButton;
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
-            Console.WriteLine("Dijkstra button clicked");
             methodName = "Dijkstra";
         }
 
@@ -306,6 +329,7 @@ public class Game1 : Game
         if (mouseState.LeftButton == ButtonState.Pressed && previousState.LeftButton == ButtonState.Released && buttonRect.Contains(mouseState.Position))
         {
             graph.ResetPathCosts();
+            isRandomized = false;
             
         }
         base.Update(gameTime);
@@ -330,7 +354,7 @@ public class Game1 : Game
         DrawDepthFirstButton();
         DrawObstacleButton();
         DrawClearButton();
-        spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 2), Color.Black);
+        spriteBatch.DrawString(pathCostFont, $"Last Path Cost: {lastPathCost.ToString("0.0", CultureInfo.InvariantCulture)}", new Vector2(screenWidth / 2 - 125, screenMargin / 5), Color.White);
 
         base.Draw(gameTime);
         spriteBatch.End();
@@ -410,10 +434,10 @@ public class Game1 : Game
                 if (rightEdge != null)
                 {
                     float originalValue = rightEdge.Distance;
-                    float rounded = (float)Math.Round(originalValue, 1);
+                    int rounded = (int)originalValue;
                     spriteBatch.DrawString(
                         distanceFont,
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        rounded.ToString(),
                         new Vector2(currPoint.X * gridSize + screenMargin + gridSize / 2, currPoint.Y * gridSize + screenMargin),
                         Color.Black,
                         0f,
@@ -427,10 +451,10 @@ public class Game1 : Game
                 if (downEdge != null)
                 {
                     float originalValue = downEdge.Distance;
-                    float rounded = (float)Math.Round(originalValue, 1);
+                    int rounded = (int)Math.Round(originalValue, 1);
                     spriteBatch.DrawString(
                         distanceFont,
-                        rounded.ToString("0.0", CultureInfo.InvariantCulture),
+                        rounded.ToString(),
                         new Vector2(currPoint.X * gridSize + screenMargin, currPoint.Y * gridSize + screenMargin + gridSize / 2),
                         Color.Black,
                         0f,
@@ -591,6 +615,58 @@ public class Game1 : Game
         visitedAnimationTimer = 0f;
         visitedAnimationInProgress = true;
 
+    }
+    public void RandomizeGraph() {
+        Random random = new Random();
+        for (int i = 0; i < graphWidth; i++)
+        {
+            for (int j = 0; j < graphHeight; j++)
+            {
+                double a = (double)(random.NextDouble() * 20 + 1);
+                double b = (double)(random.NextDouble() * 20 + 1);
+                double c = Math.Sqrt(a * a + b * b);
+
+                if (i < graphWidth - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j))).Distance = (float)a;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j)), graph.Search(new Point(i, j))).Distance = (float)a;
+
+                }
+
+                if (j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i, j + 1))).Distance = (float)b;
+                    graph.GetEdge(graph.Search(new Point(i, j + 1)), graph.Search(new Point(i, j))).Distance = (float)b;
+
+                }
+
+                if (i < graphWidth - 1 && j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j + 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+                if(i < graphWidth - 1 && j > 0)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i + 1, j - 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i + 1, j - 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+
+                if (i > 0 && j < graphHeight - 1)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i - 1, j + 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i - 1, j + 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+                if(i > 0 && j > 0)
+                {
+                    graph.GetEdge(graph.Search(new Point(i, j)), graph.Search(new Point(i - 1, j - 1))).Distance = (float)c;
+                    graph.GetEdge(graph.Search(new Point(i - 1, j - 1)), graph.Search(new Point(i, j))).Distance = (float)c;
+
+                }
+            }
+        }
     }
 
 }
